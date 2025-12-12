@@ -1,10 +1,20 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Root path
+  root 'emails#index'
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Email routes
+  resources :emails, only: [:index, :show]
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Reporting routes
+  resources :reports, only: [:create]
+
+  # Admin routes
+  namespace :admin do
+    get 'dashboard', to: 'dashboard#index'
+  end
+
+  # Health check
+  get 'up' => 'rails/health#show', as: :rails_health_check
 end

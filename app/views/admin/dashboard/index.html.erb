@@ -1,0 +1,58 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <%= link_to '← Back to Inbox', root_path, class: 'text-blue-600 hover:underline' %>
+    <h1 class="text-3xl font-bold mt-2">Admin Dashboard</h1>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white shadow rounded-lg p-6">
+      <h3 class="text-gray-600 text-sm font-medium">Total Emails</h3>
+      <p class="text-3xl font-bold mt-2"><%= @total_emails %></p>
+    </div>
+    <div class="bg-white shadow rounded-lg p-6">
+      <h3 class="text-gray-600 text-sm font-medium">Reported Emails</h3>
+      <p class="text-3xl font-bold mt-2"><%= @total_reports %></p>
+    </div>
+    <div class="bg-white shadow rounded-lg p-6">
+      <h3 class="text-gray-600 text-sm font-medium">Confirmed Phishing</h3>
+      <p class="text-3xl font-bold mt-2 text-red-600"><%= @phishing_emails %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Risk Distribution</h2>
+      <div class="space-y-3">
+        <% %w[low medium high critical].each do |level| %>
+          <% count = @risk_distribution[level] || 0 %>
+          <div class="flex items-center justify-between">
+            <span class="capitalize font-medium"><%= level %> Risk</span>
+            <div class="flex items-center gap-2">
+              <div class="w-48 bg-gray-200 rounded-full h-4">
+                <% percentage = @total_reports > 0 ? (count.to_f / @total_reports * 100).round : 0 %>
+                <div class="h-4 rounded-full <%= level == 'low' ? 'bg-green-500' : level == 'medium' ? 'bg-yellow-500' : level == 'high' ? 'bg-orange-500' : 'bg-red-500' %>" style="width: <%= percentage %>%"></div>
+              </div>
+              <span class="text-sm font-bold w-12 text-right"><%= count %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Top 10 Indicators</h2>
+      <div class="space-y-2">
+        <% if @common_indicators.any? %>
+          <% @common_indicators.each do |description, count| %>
+            <div class="flex justify-between items-center text-sm border-b pb-2">
+              <span class="text-gray-700"><%= truncate(description, length: 50) %></span>
+              <span class="font-bold text-gray-900"><%= count %></span>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-gray-500">No indicators detected yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

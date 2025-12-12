@@ -1,0 +1,67 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <%= link_to '← Back to Inbox', emails_path, class: 'text-blue-600 hover:underline mb-4 inline-block' %>
+
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <div class="border-b pb-4 mb-4">
+      <h1 class="text-2xl font-bold"><%= @email.subject %></h1>
+      <div class="mt-2 text-sm text-gray-600">
+        <p><strong>From:</strong> <%= @email.sender_name %> &lt;<%= @email.sender_email %>&gt;</p>
+        <p><strong>To:</strong> <%= @email.recipient_email %></p>
+        <p><strong>Date:</strong> <%= @email.received_at.strftime('%B %d, %Y at %H:%M') %></p>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h3 class="font-semibold mb-2">Email Body:</h3>
+      <div class="bg-gray-50 p-4 rounded border">
+        <%= simple_format(@email.body_plain) %>
+      </div>
+    </div>
+
+    <% unless @email.reported? %>
+      <div class="mb-6">
+        <%= button_to 'Report as Phishing', reports_path(email_id: @email.id), method: :post, class: 'bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700' %>
+      </div>
+    <% end %>
+
+    <% if @email.threat_score %>
+      <div class="border-t pt-4">
+        <h2 class="text-xl font-bold mb-4">Analysis Results</h2>
+        
+        <div class="mb-4">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold">Threat Score:</span>
+            <span class="text-2xl font-bold"><%= @email.threat_score.score %> / 100</span>
+            <% risk = @email.threat_score.risk_level %>
+            <span class="px-3 py-1 rounded <%= risk == 'low' ? 'bg-green-100 text-green-800' : risk == 'medium' ? 'bg-yellow-100 text-yellow-800' : risk == 'high' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800' %>">
+              <%= risk.titleize %> Risk
+            </span>
+          </div>
+        </div>
+
+        <% if @email.phishing_indicators.any? %>
+          <h3 class="font-semibold mb-3">Detected Indicators (<%= @email.phishing_indicators.count %>):</h3>
+          <div class="space-y-2">
+            <% @email.phishing_indicators.group_by(&:indicator_type).each do |type, indicators| %>
+              <div class="border rounded p-3">
+                <h4 class="font-medium text-gray-700 capitalize mb-2"><%= type %> Indicators:</h4>
+                <ul class="list-disc list-inside space-y-1">
+                  <% indicators.each do |indicator| %>
+                    <li class="text-sm">
+                      <span class="px-2 py-0.5 text-xs rounded <%= indicator.severity == 'low' ? 'bg-green-100 text-green-800' : indicator.severity == 'medium' ? 'bg-yellow-100 text-yellow-800' : indicator.severity == 'high' ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800' %>">
+                        <%= indicator.severity.upcase %>
+                      </span>
+                      <%= indicator.description %>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-gray-600">No phishing indicators detected. This email appears legitimate.</p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
