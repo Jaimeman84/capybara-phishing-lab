@@ -1,0 +1,441 @@
+# PhishingLab Folder Structure
+
+## Complete Directory Architecture
+
+```
+capybara-phishlab/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                    # GitHub Actions CI/CD pipeline
+│
+├── app/
+│   ├── assets/
+│   │   ├── images/                   # Application images and icons
+│   │   ├── stylesheets/
+│   │   │   ├── application.css       # Main stylesheet
+│   │   │   ├── components/           # Component-specific styles
+│   │   │   │   ├── inbox.css
+│   │   │   │   ├── email_viewer.css
+│   │   │   │   ├── dashboard.css
+│   │   │   │   └── indicators.css
+│   │   │   └── admin/                # Admin dashboard styles
+│   │   │       └── analytics.css
+│   │   └── javascripts/
+│   │       ├── application.js        # Main JS entry point
+│   │       └── controllers/          # Stimulus controllers (if using Hotwire)
+│   │           ├── inbox_controller.js
+│   │           └── email_report_controller.js
+│   │
+│   ├── controllers/
+│   │   ├── application_controller.rb
+│   │   ├── concerns/                 # Shared controller concerns
+│   │   │   └── error_handling.rb
+│   │   ├── emails_controller.rb      # Inbox and email display
+│   │   ├── reports_controller.rb     # Email reporting workflow
+│   │   ├── analysis_controller.rb    # Analysis results
+│   │   └── admin/
+│   │       ├── dashboard_controller.rb
+│   │       ├── emails_controller.rb
+│   │       └── analytics_controller.rb
+│   │
+│   ├── models/
+│   │   ├── concerns/                 # ActiveRecord concerns
+│   │   │   ├── scorable.rb          # Threat scoring behavior
+│   │   │   └── reportable.rb        # Reporting behavior
+│   │   ├── email.rb                  # Core email entity
+│   │   ├── phishing_indicator.rb     # Detected indicators
+│   │   ├── report.rb                 # User-submitted reports
+│   │   ├── threat_score.rb           # Calculated threat scores
+│   │   ├── url_analysis.rb           # URL reputation results
+│   │   ├── sender_analysis.rb        # Sender authentication results
+│   │   ├── content_analysis.rb       # Content pattern results
+│   │   └── attachment_analysis.rb    # Attachment risk results
+│   │
+│   ├── services/
+│   │   ├── concerns/                 # Shared service concerns
+│   │   │   └── loggable.rb
+│   │   ├── phishing_detection/       # Phishing detection services (SRP)
+│   │   │   ├── base_analyzer.rb      # Abstract base class
+│   │   │   ├── url_analyzer.rb       # URL reputation checking
+│   │   │   ├── sender_analyzer.rb    # Sender authentication
+│   │   │   ├── content_analyzer.rb   # Content pattern matching
+│   │   │   └── attachment_analyzer.rb # Attachment risk assessment
+│   │   ├── phishing_detection_service.rb  # Orchestrator (Facade pattern)
+│   │   ├── threat_scoring_engine.rb  # Scoring algorithm
+│   │   ├── email_import_service.rb   # Email data seeding
+│   │   └── report_processing_service.rb # Report workflow
+│   │
+│   ├── repositories/                 # Repository pattern (optional, for complex queries)
+│   │   ├── email_repository.rb
+│   │   └── report_repository.rb
+│   │
+│   ├── decorators/                   # View presentation logic (Draper gem)
+│   │   ├── email_decorator.rb
+│   │   └── threat_score_decorator.rb
+│   │
+│   ├── views/
+│   │   ├── layouts/
+│   │   │   ├── application.html.erb
+│   │   │   └── admin.html.erb
+│   │   ├── emails/
+│   │   │   ├── index.html.erb        # Inbox simulator
+│   │   │   └── show.html.erb         # Email detail view
+│   │   ├── reports/
+│   │   │   ├── new.html.erb          # Report submission form
+│   │   │   └── show.html.erb         # Report confirmation
+│   │   ├── analysis/
+│   │   │   └── show.html.erb         # Analysis results
+│   │   └── admin/
+│   │       ├── dashboard/
+│   │       │   └── index.html.erb    # Admin dashboard
+│   │       ├── analytics/
+│   │       │   └── index.html.erb    # Threat analytics
+│   │       └── emails/
+│   │           ├── index.html.erb    # All emails list
+│   │           └── show.html.erb     # Admin email view
+│   │
+│   ├── helpers/
+│   │   ├── application_helper.rb
+│   │   ├── emails_helper.rb
+│   │   ├── indicators_helper.rb
+│   │   └── admin/
+│   │       └── dashboard_helper.rb
+│   │
+│   └── jobs/                         # Background jobs (optional)
+│       └── email_analysis_job.rb
+│
+├── config/
+│   ├── application.rb
+│   ├── database.yml
+│   ├── routes.rb
+│   ├── environments/
+│   │   ├── development.rb
+│   │   ├── test.rb
+│   │   └── production.rb
+│   ├── initializers/
+│   │   ├── phishing_detection_config.rb  # Detection thresholds
+│   │   └── threat_scoring_config.rb      # Scoring weights
+│   └── locales/
+│       └── en.yml
+│
+├── db/
+│   ├── migrate/                      # Database migrations
+│   │   ├── 001_create_emails.rb
+│   │   ├── 002_create_phishing_indicators.rb
+│   │   ├── 003_create_reports.rb
+│   │   ├── 004_create_threat_scores.rb
+│   │   ├── 005_create_url_analyses.rb
+│   │   ├── 006_create_sender_analyses.rb
+│   │   ├── 007_create_content_analyses.rb
+│   │   └── 008_create_attachment_analyses.rb
+│   ├── seeds/                        # Seed data organization
+│   │   ├── legitimate_emails.rb
+│   │   ├── phishing_emails.rb
+│   │   └── mixed_scenarios.rb
+│   ├── seeds.rb                      # Main seed file
+│   └── schema.rb
+│
+├── lib/
+│   ├── tasks/                        # Custom rake tasks
+│   │   ├── demo.rake                 # Demo data management
+│   │   └── analysis.rake             # Run batch analysis
+│   └── phishing_lab/                 # Custom library code
+│       ├── threat_intelligence/      # External API integrations (future)
+│       │   └── url_reputation_client.rb
+│       └── pattern_matchers/         # Regex patterns for content analysis
+│           ├── urgency_patterns.rb
+│           ├── credential_patterns.rb
+│           └── spoofing_patterns.rb
+│
+├── spec/
+│   ├── factories/                    # FactoryBot factories
+│   │   ├── emails.rb
+│   │   ├── phishing_indicators.rb
+│   │   ├── reports.rb
+│   │   └── threat_scores.rb
+│   ├── fixtures/                     # Test email samples
+│   │   ├── legitimate_email_1.json
+│   │   ├── phishing_email_credential_harvest.json
+│   │   ├── phishing_email_malware.json
+│   │   └── phishing_email_social_engineering.json
+│   ├── support/
+│   │   ├── factory_bot.rb
+│   │   ├── database_cleaner.rb
+│   │   ├── capybara.rb
+│   │   ├── simplecov.rb
+│   │   └── shared_examples/          # Reusable test examples
+│   │       └── analyzable.rb
+│   ├── models/                       # Model unit tests
+│   │   ├── email_spec.rb
+│   │   ├── phishing_indicator_spec.rb
+│   │   ├── report_spec.rb
+│   │   └── threat_score_spec.rb
+│   ├── services/                     # Service unit tests
+│   │   ├── phishing_detection/
+│   │   │   ├── url_analyzer_spec.rb
+│   │   │   ├── sender_analyzer_spec.rb
+│   │   │   ├── content_analyzer_spec.rb
+│   │   │   └── attachment_analyzer_spec.rb
+│   │   ├── phishing_detection_service_spec.rb
+│   │   ├── threat_scoring_engine_spec.rb
+│   │   └── report_processing_service_spec.rb
+│   ├── requests/                     # Request/API tests
+│   │   ├── emails_spec.rb
+│   │   ├── reports_spec.rb
+│   │   └── admin/
+│   │       └── dashboard_spec.rb
+│   ├── features/                     # Capybara feature specs
+│   │   ├── view_inbox_spec.rb
+│   │   ├── report_phishing_email_spec.rb
+│   │   ├── view_analysis_results_spec.rb
+│   │   └── admin/
+│   │       └── view_dashboard_spec.rb
+│   └── spec_helper.rb
+│
+├── features/                         # Cucumber BDD features
+│   ├── support/
+│   │   ├── env.rb                    # Cucumber environment setup
+│   │   └── hooks.rb                  # Before/After hooks
+│   ├── step_definitions/
+│   │   ├── email_steps.rb
+│   │   ├── reporting_steps.rb
+│   │   ├── analysis_steps.rb
+│   │   └── admin_steps.rb
+│   ├── inbox_simulation.feature
+│   ├── phishing_detection.feature
+│   ├── email_reporting.feature
+│   ├── threat_scoring.feature
+│   └── admin_dashboard.feature
+│
+├── coverage/                         # SimpleCov output (gitignored)
+│   └── index.html
+│
+├── docs/                             # Documentation
+│   ├── architecture/
+│   │   ├── adr/                      # Architecture Decision Records
+│   │   │   ├── 001-use-service-objects.md
+│   │   │   ├── 002-threat-scoring-algorithm.md
+│   │   │   └── 003-repository-pattern.md
+│   │   ├── system-design.md
+│   │   └── data-flow.md
+│   ├── api/                          # YARD-generated API docs
+│   ├── user-guide.md
+│   ├── testing-guide.md
+│   └── demo-script.md
+│
+├── public/                           # Static assets
+│   ├── 404.html
+│   ├── 422.html
+│   ├── 500.html
+│   └── favicon.ico
+│
+├── tmp/                              # Temporary files (gitignored)
+├── log/                              # Application logs (gitignored)
+├── vendor/                           # Vendored dependencies
+│
+├── .gitignore
+├── .rspec                            # RSpec configuration
+├── .rubocop.yml                      # RuboCop style configuration
+├── cucumber.yml                      # Cucumber profiles
+├── Gemfile
+├── Gemfile.lock
+├── Rakefile
+├── README.md                         # Main project documentation
+├── workflow.mdc                      # Development workflow
+├── folder-structure.mdc              # This file
+├── icp.mdc                           # Ideal Customer Profile
+├── brd.mdc                           # Business Requirements
+└── ard.mdc                           # Architecture Requirements
+```
+
+---
+
+## Directory Purpose & Conventions
+
+### `/app` - Application Core
+Primary application code following Rails MVC pattern with service-oriented enhancements.
+
+**Key Principles:**
+- Controllers handle HTTP and delegate to services
+- Models contain data validation and associations only
+- Services contain business logic (one service per responsibility)
+- Decorators handle presentation logic
+- Repositories encapsulate complex queries (optional)
+
+### `/spec` - RSpec Tests
+Comprehensive test suite following AAA pattern (Arrange, Act, Assert).
+
+**Coverage Requirements:**
+- Models: 100%
+- Services: 100%
+- Controllers: 100%
+- Helpers: 100%
+
+**Test Types:**
+- Unit tests: Models, services, helpers
+- Request tests: Controller endpoints
+- Feature tests: User workflows with Capybara
+
+### `/features` - Cucumber BDD
+Business-readable acceptance tests written in Gherkin syntax.
+
+**Organization:**
+- One feature file per major workflow
+- Shared step definitions in `/step_definitions`
+- Page objects pattern for UI interaction (in support/)
+
+### `/lib` - Custom Libraries
+Reusable code not specific to Rails framework.
+
+**Contents:**
+- Pattern matchers for phishing detection
+- External API clients
+- Custom rake tasks
+
+### `/docs` - Documentation
+Comprehensive project documentation.
+
+**Standards:**
+- Architecture Decision Records (ADRs) for major decisions
+- YARD comments in code for API documentation
+- Markdown for guides and tutorials
+
+### `/db/seeds` - Demo Data
+Organized seed data for realistic demo scenarios.
+
+**Categories:**
+- Legitimate emails (no phishing indicators)
+- Credential harvesting phishing
+- Malware delivery phishing
+- Social engineering phishing
+- Edge cases (legitimate emails with suspicious traits)
+
+---
+
+## Naming Conventions
+
+### Files
+- Ruby files: `snake_case.rb`
+- Test files: `*_spec.rb` (RSpec), `*.feature` (Cucumber)
+- Config files: `snake_case.yml`
+
+### Classes
+- Models: Singular noun (e.g., `Email`, `Report`)
+- Services: Noun + Service/Engine (e.g., `PhishingDetectionService`)
+- Decorators: Model + Decorator (e.g., `EmailDecorator`)
+- Concerns: Adjective/Verb (e.g., `Scorable`, `Reportable`)
+
+### Database
+- Tables: Plural snake_case (e.g., `emails`, `phishing_indicators`)
+- Columns: snake_case (e.g., `sender_email`, `threat_score`)
+- Foreign keys: `model_id` (e.g., `email_id`)
+
+---
+
+## SOLID Principle Mapping
+
+### Single Responsibility Principle (SRP)
+- **Evidence:** Each analyzer in `/app/services/phishing_detection/` handles one type of analysis
+- **Example:** `UrlAnalyzer` only analyzes URLs, `SenderAnalyzer` only validates senders
+
+### Open/Closed Principle (OCP)
+- **Evidence:** `BaseAnalyzer` abstract class allows new analyzers without modifying existing code
+- **Example:** Add new `ImageAnalyzer` by extending `BaseAnalyzer`
+
+### Liskov Substitution Principle (LSP)
+- **Evidence:** All analyzers inherit from `BaseAnalyzer` and can be used interchangeably
+- **Example:** `PhishingDetectionService` works with any analyzer implementing base interface
+
+### Interface Segregation Principle (ISP)
+- **Evidence:** Small, focused concerns like `Scorable` and `Reportable`
+- **Example:** Models include only concerns they actually use
+
+### Dependency Inversion Principle (DIP)
+- **Evidence:** Controllers depend on service abstractions, not concrete implementations
+- **Example:** `EmailsController` uses `PhishingDetectionService` interface, not specific analyzers
+
+---
+
+## Clean Architecture Benefits
+
+### Testability
+- Services can be tested in isolation
+- Dependencies can be mocked/stubbed easily
+- Clear separation enables focused unit tests
+
+### Maintainability
+- Changes to detection logic isolated to specific analyzers
+- UI changes don't affect business logic
+- Database changes don't ripple through application
+
+### Scalability
+- New detection types added without modifying existing code
+- Background jobs can be added for async processing
+- API layer can be added without disrupting MVC
+
+### Demonstrability
+- Clear structure shows architectural understanding
+- SOLID principles evident in organization
+- Professional project layout impresses stakeholders
+
+---
+
+## Testing Organization
+
+### Test File Placement
+Tests mirror application structure:
+- `app/models/email.rb` → `spec/models/email_spec.rb`
+- `app/services/threat_scoring_engine.rb` → `spec/services/threat_scoring_engine_spec.rb`
+- `app/controllers/reports_controller.rb` → `spec/requests/reports_spec.rb`
+
+### Shared Examples
+Located in `spec/support/shared_examples/` for reusable test behaviors:
+```ruby
+# spec/support/shared_examples/analyzable.rb
+RSpec.shared_examples 'an analyzer' do
+  it { is_expected.to respond_to(:analyze) }
+  it { is_expected.to respond_to(:indicators) }
+end
+```
+
+### Factory Organization
+One factory file per model, organized by domain:
+```ruby
+# spec/factories/emails.rb
+FactoryBot.define do
+  factory :email do
+    trait :legitimate
+    trait :phishing_credential_harvest
+    trait :phishing_malware
+  end
+end
+```
+
+---
+
+## Configuration Files
+
+### `.rspec`
+```
+--require spec_helper
+--format documentation
+--color
+```
+
+### `.rubocop.yml`
+Enforces Ruby style guide with project-specific overrides
+
+### `cucumber.yml`
+Defines cucumber profiles (default, wip, ci)
+
+### SimpleCov Configuration
+In `spec/support/simplecov.rb` with 100% coverage requirement
+
+---
+
+## Next Steps
+
+After reviewing this structure:
+1. Validate alignment with BRD and ARD
+2. Confirm SOLID principle implementation approach
+3. Proceed to project scaffolding (workflow.mdc Stage 2)

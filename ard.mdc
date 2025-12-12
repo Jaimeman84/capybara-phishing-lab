@@ -1,0 +1,1393 @@
+# Architecture Requirements Document (ARD)
+
+## Document Control
+
+| Field | Value |
+|-------|-------|
+| Project Name | PhishingLab - Email Security Analysis Simulator |
+| Document Version | 1.0 |
+| Created Date | 2025-12-11 |
+| Document Owner | Development Team |
+| Status | Draft |
+| Related Documents | BRD v1.0, ICP v1.0, workflow.mdc, folder-structure.mdc |
+
+---
+
+## Executive Summary
+
+This Architecture Requirements Document (ARD) defines the technical architecture, design patterns, and implementation guidelines for PhishingLab. The architecture prioritizes:
+
+1. **Testability** - 100% coverage through clean separation of concerns
+2. **SOLID Principles** - Demonstrable adherence to object-oriented design best practices
+3. **Maintainability** - Clear structure enabling easy modification and extension
+4. **Simplicity** - Avoiding over-engineering while maintaining professional quality
+
+---
+
+## Architectural Principles
+
+### AP-1: SOLID Principles Application
+
+#### Single Responsibility Principle (SRP)
+**Definition:** A class should have one, and only one, reason to change.
+
+**Implementation:**
+- Each analyzer handles one type of detection (URL, sender, content, attachment)
+- Controllers handle HTTP concerns only, delegating business logic to services
+- Models contain only data validation and associations
+- Services contain business logic for a single domain concept
+
+**Examples:**
+```ruby
+# GOOD: Single responsibility
+class UrlAnalyzer
+  def analyze(email)
+    # Only analyzes URLs, nothing else
+  end
+end
+
+# BAD: Multiple responsibilities
+class EmailProcessor
+  def analyze_urls(email); end
+  def send_notification(email); end
+  def update_database(email); end
+end
+```
+
+---
+
+#### Open/Closed Principle (OCP)
+**Definition:** Software entities should be open for extension but closed for modification.
+
+**Implementation:**
+- Abstract base class `BaseAnalyzer` allows new analyzers without modifying existing code
+- Strategy pattern for threat scoring allows new algorithms
+- Decorator pattern for email presentation logic
+
+**Examples:**
+```ruby
+# BaseAnalyzer provides extension point
+class BaseAnalyzer
+  def analyze(email)
+    raise NotImplementedError
+  end
+end
+
+# New analyzers extend without modifying base
+class ImageAnalyzer < BaseAnalyzer
+  def analyze(email)
+    # New functionality
+  end
+end
+```
+
+---
+
+#### Liskov Substitution Principle (LSP)
+**Definition:** Derived classes must be substitutable for their base classes.
+
+**Implementation:**
+- All analyzers inherit from `BaseAnalyzer` and implement the same interface
+- `PhishingDetectionService` can use any analyzer interchangeably
+- All analyzers return consistent data structures
+
+**Examples:**
+```ruby
+# All analyzers are substitutable
+analyzers = [
+  UrlAnalyzer.new,
+  SenderAnalyzer.new,
+  ContentAnalyzer.new,
+  AttachmentAnalyzer.new
+]
+
+analyzers.each { |analyzer| analyzer.analyze(email) }
+```
+
+---
+
+#### Interface Segregation Principle (ISP)
+**Definition:** Clients should not be forced to depend on interfaces they don't use.
+
+**Implementation:**
+- Small, focused concerns (Scorable, Reportable) instead of one large concern
+- Models include only the concerns they actually need
+- Service objects have minimal, specific interfaces
+
+**Examples:**
+```ruby
+# GOOD: Focused concerns
+module Scorable
+  def calculate_threat_score
+    # Only scoring logic
+  end
+end
+
+module Reportable
+  def mark_as_reported
+    # Only reporting logic
+  end
+end
+
+# Models include only what they need
+class Email < ApplicationRecord
+  include Reportable
+  include Scorable
+end
+```
+
+---
+
+#### Dependency Inversion Principle (DIP)
+**Definition:** Depend on abstractions, not concretions.
+
+**Implementation:**
+- Controllers depend on service interfaces, not implementations
+- Services use dependency injection for analyzers
+- Configuration-driven behavior (weights, thresholds)
+
+**Examples:**
+```ruby
+# Controller depends on abstraction
+class EmailsController < ApplicationController
+  def show
+    @email = Email.find(params[:id])
+    @analysis = PhishingDetectionService.new(@email).analyze
+  end
+end
+
+# Service accepts injected dependencies
+class PhishingDetectionService
+  def initialize(email, analyzers: default_analyzers)
+    @email = email
+    @analyzers = analyzers
+  end
+end
+```
+
+---
+
+### AP-2: Design Patterns
+
+#### Service Object Pattern
+**Purpose:** Encapsulate business logic in dedicated service classes
+
+**When to Use:**
+- Complex business operations spanning multiple models
+- Operations that don't naturally belong to a single model
+- Actions that require external dependencies
+
+**Implementation:**
+```ruby
+# app/services/phishing_detection_service.rb
+class PhishingDetectionService
+  def initialize(email)
+    @email = email
+  end
+
+  def analyze
+    indicators = collect_indicators
+    score = ThreatScoringEngine.new(@email, indicators).calculate
+    persist_results(indicators, score)
+  end
+
+  private
+
+  def collect_indicators
+    analyzers.flat_map { |analyzer| analyzer.analyze(@email) }
+  end
+
+  def analyzers
+    @analyzers ||= [
+      PhishingDetection::UrlAnalyzer.new,
+      PhishingDetection::SenderAnalyzer.new,
+      PhishingDetection::ContentAnalyzer.new,
+      PhishingDetection::AttachmentAnalyzer.new
+    ]
+  end
+end
+```
+
+---
+
+#### Repository Pattern (Optional)
+**Purpose:** Encapsulate data access logic
+
+**When to Use:**
+- Complex queries that would clutter controllers
+- Queries used in multiple places
+- Need to swap data sources (e.g., testing)
+
+**Implementation:**
+```ruby
+# app/repositories/email_repository.rb
+class EmailRepository
+  def self.phishing_emails
+    Email.where(is_phishing: true)
+  end
+
+  def self.with_high_threat_score
+    Email.joins(:threat_score)
+         .where('threat_scores.score >= ?', 51)
+  end
+
+  def self.reported_today
+    Email.joins(:report)
+         .where('reports.reported_at >= ?', Time.zone.today)
+  end
+end
+```
+
+---
+
+#### Decorator Pattern
+**Purpose:** Add presentation logic without cluttering models
+
+**When to Use:**
+- Formatting data for views
+- Calculated display values
+- Conditional UI logic
+
+**Implementation:**
+```ruby
+# app/decorators/email_decorator.rb
+class EmailDecorator < Draper::Decorator
+  delegate_all
+
+  def risk_badge_class
+    case object.threat_score&.risk_level
+    when 'low' then 'badge-success'
+    when 'medium' then 'badge-warning'
+    when 'high' then 'badge-danger'
+    when 'critical' then 'badge-critical'
+    else 'badge-secondary'
+    end
+  end
+
+  def sender_display
+    "#{object.sender_name} <#{object.sender_email}>"
+  end
+
+  def short_subject
+    object.subject.truncate(50)
+  end
+end
+```
+
+---
+
+#### Strategy Pattern
+**Purpose:** Allow algorithm selection at runtime
+
+**When to Use:**
+- Multiple algorithms for the same task
+- Need to swap implementations
+- Configuration-driven behavior
+
+**Implementation:**
+```ruby
+# Threat scoring strategies
+class ThreatScoringEngine
+  def initialize(email, indicators, strategy: DefaultScoringStrategy)
+    @email = email
+    @indicators = indicators
+    @strategy = strategy.new
+  end
+
+  def calculate
+    @strategy.calculate(@indicators)
+  end
+end
+
+class DefaultScoringStrategy
+  def calculate(indicators)
+    indicators.sum { |i| weight_for(i) }
+  end
+end
+
+class WeightedScoringStrategy
+  def calculate(indicators)
+    # Alternative algorithm
+  end
+end
+```
+
+---
+
+### AP-3: Testing Architecture
+
+#### Test Pyramid Structure
+
+```
+        /\
+       /  \        E2E Tests (Cucumber)
+      /____\       Few, slow, high-value scenarios
+     /      \
+    /        \     Integration Tests (Capybara)
+   /__________\    Medium number, user workflows
+  /            \
+ /              \  Unit Tests (RSpec)
+/________________\ Many, fast, comprehensive coverage
+```
+
+**Test Distribution:**
+- Unit tests: 70% (models, services, helpers)
+- Integration tests: 20% (requests, feature specs)
+- E2E tests: 10% (cucumber scenarios)
+
+---
+
+#### Test Organization
+
+**Unit Tests (RSpec):**
+```ruby
+# spec/models/email_spec.rb
+RSpec.describe Email, type: :model do
+  describe 'validations' do
+    it { should validate_presence_of(:sender_email) }
+  end
+
+  describe 'associations' do
+    it { should have_one(:report) }
+    it { should have_many(:phishing_indicators) }
+  end
+
+  describe '#calculate_threat_score' do
+    # Test business logic
+  end
+end
+
+# spec/services/phishing_detection_service_spec.rb
+RSpec.describe PhishingDetectionService do
+  let(:email) { create(:email, :phishing_credential_harvest) }
+  let(:service) { described_class.new(email) }
+
+  describe '#analyze' do
+    it 'detects phishing indicators' do
+      indicators = service.analyze
+      expect(indicators).not_to be_empty
+    end
+
+    it 'persists results to database' do
+      expect { service.analyze }.to change(PhishingIndicator, :count)
+    end
+  end
+end
+```
+
+**Integration Tests (Capybara):**
+```ruby
+# spec/features/report_phishing_email_spec.rb
+RSpec.feature 'Reporting phishing email', type: :feature do
+  scenario 'User reports suspicious email' do
+    email = create(:email)
+
+    visit emails_path
+    click_on email.subject
+    click_button 'Report Phishing'
+
+    expect(page).to have_content('Email reported successfully')
+    expect(page).to have_content('Threat Score')
+  end
+end
+```
+
+**BDD Tests (Cucumber):**
+```gherkin
+# features/phishing_detection.feature
+Feature: Phishing Detection
+  As a security analyst
+  I want emails to be automatically analyzed for phishing indicators
+  So that I can quickly identify threats
+
+  Background:
+    Given the following email exists:
+      | sender_email       | subject                    | body                              |
+      | hacker@evil.com    | Urgent: Verify your account | Click here to verify: bit.ly/xyz |
+
+  Scenario: Detecting suspicious URL in email
+    When the email is analyzed for phishing
+    Then the following indicators should be detected:
+      | type | description                |
+      | url  | Shortened URL detected     |
+      | url  | Suspicious domain: evil.com|
+    And the threat score should be "High"
+```
+
+---
+
+### AP-4: Data Flow Architecture
+
+#### Request Flow
+
+```
+User Browser
+    ↓
+EmailsController#show
+    ↓
+Email Model (ActiveRecord)
+    ↓
+EmailDecorator (Presentation Logic)
+    ↓
+View Template (ERB)
+    ↓
+Rendered HTML
+    ↓
+User Browser
+```
+
+#### Analysis Flow
+
+```
+User clicks "Report Phishing"
+    ↓
+ReportsController#create
+    ↓
+ReportProcessingService
+    ↓
+PhishingDetectionService
+    ↓ (parallel)
+UrlAnalyzer → PhishingIndicator
+SenderAnalyzer → PhishingIndicator
+ContentAnalyzer → PhishingIndicator
+AttachmentAnalyzer → PhishingIndicator
+    ↓
+ThreatScoringEngine
+    ↓
+ThreatScore (persisted)
+    ↓
+Redirect to Analysis Results
+```
+
+---
+
+## Technology Stack
+
+### TS-1: Core Framework
+
+**Ruby on Rails 7.1**
+
+**Rationale:**
+- Industry-standard web framework
+- Convention over configuration reduces boilerplate
+- Excellent testing ecosystem
+- ActiveRecord ORM simplifies data access
+- Strong community support
+
+**Configuration:**
+- Ruby version: 3.2+ (latest stable)
+- Rails version: ~> 7.1
+- Database: SQLite (development/test), PostgreSQL-ready (production)
+- Asset pipeline: Importmap (default Rails 7)
+- View engine: ERB (simplicity over complexity)
+
+---
+
+### TS-2: Testing Frameworks
+
+**RSpec 6.0**
+
+**Rationale:**
+- Industry-standard Ruby testing framework
+- Expressive syntax (describe/context/it)
+- Rich matcher library
+- Excellent documentation
+
+**Configuration:**
+```ruby
+# .rspec
+--require spec_helper
+--format documentation
+--color
+```
+
+---
+
+**Capybara 3.39**
+
+**Rationale:**
+- Simulates user interaction with web app
+- Supports multiple drivers (Selenium, RackTest)
+- Natural DSL for feature testing
+
+**Configuration:**
+```ruby
+# spec/support/capybara.rb
+Capybara.default_driver = :rack_test
+Capybara.javascript_driver = :selenium_chrome_headless
+```
+
+---
+
+**Cucumber 9.0 with Cucumber-Rails 2.6**
+
+**Rationale:**
+- Business-readable acceptance tests
+- Gherkin syntax for non-technical stakeholders
+- Demonstrates BDD expertise
+
+**Configuration:**
+```yaml
+# cucumber.yml
+default: --publish-quiet --format pretty --strict --tags "not @wip"
+wip: --tags @wip --wip
+ci: --format json --out cucumber_report.json
+```
+
+---
+
+**SimpleCov 0.22**
+
+**Rationale:**
+- Code coverage analysis
+- Visual HTML reports
+- CI integration support
+
+**Configuration:**
+```ruby
+# spec/support/simplecov.rb
+SimpleCov.start 'rails' do
+  add_filter '/spec/'
+  add_filter '/config/'
+  add_filter '/vendor/'
+
+  minimum_coverage 100
+  refuse_coverage_drop
+
+  add_group 'Services', 'app/services'
+  add_group 'Decorators', 'app/decorators'
+end
+```
+
+---
+
+### TS-3: Supporting Gems
+
+**FactoryBot Rails 6.2**
+- Test data generation
+- Trait-based factory patterns
+- Reduces test brittleness
+
+**Faker 3.2**
+- Realistic fake data
+- Email addresses, names, text
+- Enhances seed data realism
+
+**Database Cleaner**
+- Clean database state between tests
+- Prevents test pollution
+
+**Shoulda Matchers**
+- RSpec matchers for common validations
+- Reduces test boilerplate
+
+**RuboCop 1.50**
+- Ruby style enforcement
+- Consistency across codebase
+
+**Brakeman 6.0**
+- Static security analysis
+- OWASP vulnerability detection
+
+**Draper (Optional)**
+- Decorator pattern implementation
+- Clean view presentation logic
+
+**Chartkick (Optional)**
+- Dashboard charts
+- Simple charting API
+
+---
+
+## System Architecture
+
+### SA-1: Logical Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                     Presentation Layer                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │  Views (ERB) │  │   Helpers    │  │  Decorators  │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+└────────────────────────┬────────────────────────────────┘
+                         │
+┌────────────────────────┴────────────────────────────────┐
+│                    Application Layer                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │ Controllers  │  │   Services   │  │     Jobs     │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+└────────────────────────┬────────────────────────────────┘
+                         │
+┌────────────────────────┴────────────────────────────────┐
+│                      Domain Layer                        │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │    Models    │  │   Concerns   │  │ Repositories │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+└────────────────────────┬────────────────────────────────┘
+                         │
+┌────────────────────────┴────────────────────────────────┐
+│                   Infrastructure Layer                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │  Database    │  │  File System │  │  External    │  │
+│  │  (SQLite)    │  │              │  │  APIs        │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+### SA-2: Component Architecture
+
+#### Email Analysis Component
+
+```
+PhishingDetectionService (Facade)
+    │
+    ├─→ UrlAnalyzer
+    │      └─→ PhishingIndicator (URL type)
+    │
+    ├─→ SenderAnalyzer
+    │      └─→ PhishingIndicator (Sender type)
+    │
+    ├─→ ContentAnalyzer
+    │      └─→ PhishingIndicator (Content type)
+    │
+    └─→ AttachmentAnalyzer
+           └─→ PhishingIndicator (Attachment type)
+
+ThreatScoringEngine
+    │
+    ├─→ Reads all PhishingIndicators
+    ├─→ Applies weights from configuration
+    └─→ Persists ThreatScore
+```
+
+---
+
+## Database Architecture
+
+### DA-1: Entity Relationship Diagram
+
+```
+┌─────────────────┐
+│     Emails      │
+│─────────────────│
+│ id (PK)         │
+│ sender_email    │
+│ sender_name     │
+│ recipient_email │
+│ subject         │
+│ body_html       │
+│ body_plain      │
+│ received_at     │
+│ is_phishing     │
+│ phishing_type   │
+└─────────────────┘
+        │ 1
+        │
+        │ 0..1
+        ↓
+┌─────────────────┐
+│    Reports      │
+│─────────────────│
+│ id (PK)         │
+│ email_id (FK)   │
+│ reported_at     │
+└─────────────────┘
+
+        │ 1
+        │
+        │ 0..*
+        ↓
+┌──────────────────────┐
+│ PhishingIndicators   │
+│──────────────────────│
+│ id (PK)              │
+│ email_id (FK)        │
+│ indicator_type       │
+│ severity             │
+│ description          │
+│ details (JSON)       │
+└──────────────────────┘
+
+        │ 1
+        │
+        │ 0..1
+        ↓
+┌─────────────────┐
+│  ThreatScores   │
+│─────────────────│
+│ id (PK)         │
+│ email_id (FK)   │
+│ score           │
+│ risk_level      │
+│ calculated_at   │
+└─────────────────┘
+```
+
+---
+
+### DA-2: Database Indexes
+
+**Performance Optimization:**
+
+```ruby
+# Indexes for common queries
+add_index :emails, :sender_email
+add_index :emails, :received_at
+add_index :emails, :is_phishing
+add_index :reports, :email_id, unique: true
+add_index :phishing_indicators, :email_id
+add_index :phishing_indicators, [:indicator_type, :severity]
+add_index :threat_scores, :email_id, unique: true
+add_index :threat_scores, :risk_level
+```
+
+**Rationale:**
+- `emails(sender_email)`: Admin dashboard filtering by sender
+- `emails(received_at)`: Inbox chronological sorting
+- `emails(is_phishing)`: Metrics calculations
+- `reports(email_id)`: Unique constraint, lookup optimization
+- `phishing_indicators(email_id)`: Analysis results retrieval
+- `threat_scores(email_id)`: Unique constraint, score lookup
+
+---
+
+### DA-3: Database Constraints
+
+**Data Integrity:**
+
+```ruby
+# NOT NULL constraints
+change_column_null :emails, :sender_email, false
+change_column_null :emails, :subject, false
+change_column_null :emails, :body_plain, false
+change_column_null :emails, :received_at, false
+
+# CHECK constraints (Rails 6.1+)
+add_check_constraint :threat_scores,
+  'score >= 0 AND score <= 100',
+  name: 'score_range'
+
+# UNIQUE constraints
+add_index :reports, :email_id, unique: true
+add_index :threat_scores, :email_id, unique: true
+
+# Foreign key constraints
+add_foreign_key :reports, :emails
+add_foreign_key :phishing_indicators, :emails
+add_foreign_key :threat_scores, :emails
+```
+
+---
+
+## Security Architecture
+
+### SEC-1: Security Controls
+
+#### Input Validation
+**Protection Against:** SQL Injection, XSS, Command Injection
+
+**Implementation:**
+```ruby
+# Strong parameters in controllers
+class EmailsController < ApplicationController
+  private
+
+  def email_params
+    params.require(:email).permit(:sender_email, :subject, :body_plain)
+  end
+end
+
+# Model validations
+class Email < ApplicationRecord
+  validates :sender_email, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :subject, length: { maximum: 200 }
+  validates :body_plain, presence: true
+end
+
+# Sanitize HTML content
+class Email < ApplicationRecord
+  before_save :sanitize_html_body
+
+  private
+
+  def sanitize_html_body
+    self.body_html = ActionController::Base.helpers.sanitize(body_html)
+  end
+end
+```
+
+---
+
+#### CSRF Protection
+**Protection Against:** Cross-Site Request Forgery
+
+**Implementation:**
+```ruby
+# application_controller.rb
+class ApplicationController < ActionController::Base
+  protect_from_forgery with: :exception
+end
+
+# All forms include CSRF token
+<%= form_with model: @email do |f| %>
+  <%= f.hidden_field :authenticity_token, value: form_authenticity_token %>
+<% end %>
+```
+
+---
+
+#### SQL Injection Prevention
+**Protection Against:** SQL Injection
+
+**Implementation:**
+```ruby
+# GOOD: Parameterized queries
+Email.where('sender_email = ?', params[:email])
+
+# BAD: String interpolation (NEVER DO THIS)
+Email.where("sender_email = '#{params[:email]}'")
+
+# Use ActiveRecord query interface
+Email.where(sender_email: params[:email])
+```
+
+---
+
+#### Content Security Policy
+**Protection Against:** XSS, clickjacking
+
+**Implementation:**
+```ruby
+# config/initializers/content_security_policy.rb
+Rails.application.config.content_security_policy do |policy|
+  policy.default_src :self
+  policy.script_src  :self
+  policy.style_src   :self
+  policy.img_src     :self, :data
+  policy.font_src    :self
+  policy.connect_src :self
+  policy.frame_ancestors :none
+end
+```
+
+---
+
+### SEC-2: Security Testing
+
+**Brakeman Scan:**
+```bash
+# Run security scan
+bundle exec brakeman --confidence-level 2
+
+# Expected: 0 critical/high warnings
+```
+
+**OWASP Top 10 Checklist:**
+- [x] A01: Broken Access Control - N/A (no authentication in MVP)
+- [x] A02: Cryptographic Failures - N/A (no sensitive data storage)
+- [x] A03: Injection - Protected via strong parameters and sanitization
+- [x] A04: Insecure Design - Mitigated through security-first architecture
+- [x] A05: Security Misconfiguration - Enforced via security headers
+- [x] A06: Vulnerable Components - Monitored via Bundler Audit
+- [x] A07: Authentication Failures - N/A (no authentication in MVP)
+- [x] A08: Software and Data Integrity - Enforced via checksum verification
+- [x] A09: Logging Failures - Rails default logging enabled
+- [x] A10: SSRF - N/A (no external URL fetching in MVP)
+
+---
+
+## Configuration Management
+
+### CM-1: Environment Configuration
+
+**Development Environment:**
+```ruby
+# config/environments/development.rb
+Rails.application.configure do
+  config.cache_classes = false
+  config.eager_load = false
+  config.consider_all_requests_local = true
+  config.action_controller.perform_caching = false
+  config.active_record.migration_error = :page_load
+  config.active_record.verbose_query_logs = true
+end
+```
+
+**Test Environment:**
+```ruby
+# config/environments/test.rb
+Rails.application.configure do
+  config.cache_classes = true
+  config.eager_load = false
+  config.public_file_server.enabled = true
+  config.public_file_server.headers = { 'Cache-Control' => 'public, max-age=3600' }
+  config.action_dispatch.show_exceptions = false
+  config.action_controller.allow_forgery_protection = false
+  config.active_support.deprecation = :stderr
+end
+```
+
+**Production Environment (Future):**
+```ruby
+# config/environments/production.rb
+Rails.application.configure do
+  config.cache_classes = true
+  config.eager_load = true
+  config.consider_all_requests_local = false
+  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  config.force_ssl = true
+  config.log_level = :info
+  config.active_record.dump_schema_after_migration = false
+end
+```
+
+---
+
+### CM-2: Application Configuration
+
+**Phishing Detection Configuration:**
+```ruby
+# config/initializers/phishing_detection_config.rb
+PhishingLab.configure do |config|
+  config.suspicious_tlds = %w[.tk .ml .ga .cf .gq .xyz .top]
+  config.url_shorteners = %w[bit.ly tinyurl.com goo.gl t.co]
+  config.free_email_providers = %w[gmail.com yahoo.com hotmail.com]
+
+  config.urgency_keywords = [
+    'urgent', 'immediate', 'act now', 'expire', 'suspended',
+    'verify', 'confirm', 'action required', 'final notice'
+  ]
+
+  config.credential_keywords = [
+    'password', 'login', 'username', 'account', 'verify',
+    'update payment', 'billing information', 'credit card'
+  ]
+
+  config.executable_extensions = %w[.exe .scr .bat .cmd .vbs .js .jar]
+  config.risky_archive_extensions = %w[.zip .rar .7z .tar.gz]
+end
+```
+
+**Threat Scoring Configuration:**
+```ruby
+# config/initializers/threat_scoring_config.rb
+ThreatScoring.configure do |config|
+  config.weights = {
+    suspicious_url: 15,
+    url_shortener: 10,
+    homoglyph_domain: 20,
+    ip_based_url: 25,
+    sender_auth_failure: 25,
+    free_email_spoofing: 20,
+    lookalike_domain: 30,
+    urgency_language: 10,
+    credential_request: 20,
+    generic_greeting: 5,
+    spelling_errors: 5,
+    executable_attachment: 30,
+    macro_document: 20,
+    password_protected_archive: 15
+  }
+
+  config.risk_thresholds = {
+    low: 0..25,
+    medium: 26..50,
+    high: 51..75,
+    critical: 76..100
+  }
+end
+```
+
+---
+
+## Performance Architecture
+
+### PERF-1: Query Optimization
+
+**N+1 Query Prevention:**
+```ruby
+# BAD: N+1 queries
+@emails = Email.all
+@emails.each { |email| email.threat_score.score }
+
+# GOOD: Eager loading
+@emails = Email.includes(:threat_score).all
+@emails.each { |email| email.threat_score.score }
+```
+
+**Scopes for Reusability:**
+```ruby
+class Email < ApplicationRecord
+  scope :with_associations, -> { includes(:report, :phishing_indicators, :threat_score) }
+  scope :phishing, -> { where(is_phishing: true) }
+  scope :high_risk, -> { joins(:threat_score).where('threat_scores.score >= ?', 51) }
+  scope :recent, -> { order(received_at: :desc) }
+end
+
+# Usage
+@emails = Email.with_associations.high_risk.recent
+```
+
+---
+
+### PERF-2: Caching Strategy (Future)
+
+**Fragment Caching:**
+```erb
+<!-- Cache dashboard widgets -->
+<% cache ['dashboard', 'stats', Email.maximum(:updated_at)] do %>
+  <%= render 'dashboard/stats' %>
+<% end %>
+```
+
+**Counter Caching:**
+```ruby
+# For "Total Emails Reported" metric
+class Report < ApplicationRecord
+  belongs_to :email, counter_cache: true
+end
+
+# Migration
+add_column :emails, :reports_count, :integer, default: 0
+```
+
+---
+
+## Deployment Architecture
+
+### DEP-1: Development Deployment
+
+**Local Setup:**
+```bash
+# Clone repository
+git clone <repository-url>
+cd capybara-phishlab
+
+# Install dependencies
+bundle install
+
+# Setup database
+rails db:create db:migrate db:seed
+
+# Run tests
+rspec
+cucumber
+
+# Start server
+rails server
+```
+
+**Accessing Application:**
+- Inbox: http://localhost:3000/emails
+- Admin Dashboard: http://localhost:3000/admin/dashboard
+
+---
+
+### DEP-2: CI/CD Pipeline
+
+**GitHub Actions Workflow:**
+```yaml
+# .github/workflows/ci.yml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2
+          bundler-cache: true
+
+      - name: Run RuboCop
+        run: bundle exec rubocop
+
+      - name: Run Brakeman
+        run: bundle exec brakeman --no-pager
+
+      - name: Setup database
+        run: |
+          bundle exec rails db:create RAILS_ENV=test
+          bundle exec rails db:migrate RAILS_ENV=test
+
+      - name: Run RSpec
+        run: bundle exec rspec
+
+      - name: Run Cucumber
+        run: bundle exec cucumber
+
+      - name: Check coverage
+        run: |
+          if [ $(grep -oP '(?<=LOC \()\d+' coverage/index.html) -lt 100 ]; then
+            echo "Coverage below 100%"
+            exit 1
+          fi
+```
+
+---
+
+### DEP-3: Production Deployment (Future)
+
+**Heroku Deployment:**
+```bash
+# Create Heroku app
+heroku create phishinglab-demo
+
+# Add PostgreSQL
+heroku addons:create heroku-postgresql:mini
+
+# Configure environment
+heroku config:set RAILS_ENV=production
+heroku config:set RAILS_SERVE_STATIC_FILES=true
+
+# Deploy
+git push heroku main
+
+# Migrate and seed
+heroku run rails db:migrate db:seed
+```
+
+**Railway Deployment:**
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login and initialize
+railway login
+railway init
+
+# Deploy
+railway up
+```
+
+---
+
+## Error Handling Architecture
+
+### ERR-1: Error Handling Strategy
+
+**Controller Error Handling:**
+```ruby
+class ApplicationController < ActionController::Base
+  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+  rescue_from ActionController::ParameterMissing, with: :bad_request
+
+  private
+
+  def record_not_found
+    render file: Rails.public_path.join('404.html'), status: :not_found, layout: false
+  end
+
+  def bad_request
+    render file: Rails.public_path.join('422.html'), status: :unprocessable_entity, layout: false
+  end
+end
+```
+
+**Service Error Handling:**
+```ruby
+class PhishingDetectionService
+  class AnalysisError < StandardError; end
+
+  def analyze
+    collect_indicators
+  rescue StandardError => e
+    Rails.logger.error("Analysis failed: #{e.message}")
+    raise AnalysisError, "Unable to analyze email"
+  end
+end
+```
+
+---
+
+## Logging and Monitoring
+
+### LOG-1: Logging Strategy
+
+**Structured Logging:**
+```ruby
+# Service logging
+class PhishingDetectionService
+  def analyze
+    Rails.logger.info("Starting analysis for email #{@email.id}")
+    indicators = collect_indicators
+    Rails.logger.info("Analysis complete: #{indicators.count} indicators found")
+    indicators
+  end
+end
+```
+
+**Log Levels:**
+- **DEBUG:** Detailed diagnostic information
+- **INFO:** Normal operational messages
+- **WARN:** Potential issues that don't prevent operation
+- **ERROR:** Serious problems requiring attention
+
+---
+
+## Documentation Architecture
+
+### DOC-1: Code Documentation
+
+**YARD Documentation:**
+```ruby
+# Generates docs/api/index.html
+# Run: yard doc
+
+# Example documented service
+class PhishingDetectionService
+  # Analyzes an email for phishing indicators
+  #
+  # @param email [Email] the email to analyze
+  # @return [Array<PhishingIndicator>] detected indicators
+  # @raise [AnalysisError] if analysis fails
+  #
+  # @example Analyzing an email
+  #   service = PhishingDetectionService.new(email)
+  #   indicators = service.analyze
+  #
+  def analyze
+    # Implementation
+  end
+end
+```
+
+---
+
+### DOC-2: Architecture Decision Records
+
+**ADR Template:**
+```markdown
+# ADR-001: Use Service Objects for Business Logic
+
+## Status
+Accepted
+
+## Context
+Controllers were becoming bloated with business logic, making them difficult to test and maintain.
+
+## Decision
+Extract business logic into dedicated service objects following the Single Responsibility Principle.
+
+## Consequences
+**Positive:**
+- Controllers remain thin and focused on HTTP concerns
+- Business logic is testable in isolation
+- Services are reusable across controllers
+
+**Negative:**
+- Additional abstraction layer increases file count
+- Developers must learn service object pattern
+
+## Alternatives Considered
+- Keep logic in controllers (rejected: violates SRP)
+- Use model callbacks (rejected: tight coupling, hard to test)
+- Use concerns (rejected: doesn't scale well)
+```
+
+---
+
+## Acceptance Criteria
+
+### AC-1: Architecture Validation
+
+**Checklist:**
+- [ ] All SOLID principles demonstrable in code
+- [ ] Service objects used for complex business logic
+- [ ] Models contain only data concerns
+- [ ] Controllers are thin (< 10 lines per action)
+- [ ] Decorators handle presentation logic
+- [ ] Configuration externalized from code
+- [ ] Database properly indexed
+- [ ] Security controls implemented
+- [ ] Error handling comprehensive
+- [ ] Logging strategy in place
+
+---
+
+### AC-2: Quality Gates
+
+**Code Quality:**
+- [ ] RuboCop: 0 violations
+- [ ] Flog: Average complexity < 10
+- [ ] Flay: < 5% code duplication
+- [ ] Reek: No code smells
+
+**Security:**
+- [ ] Brakeman: 0 critical/high warnings
+- [ ] Bundle Audit: 0 vulnerable dependencies
+- [ ] OWASP checklist complete
+
+**Testing:**
+- [ ] SimpleCov: 100% coverage
+- [ ] RSpec: All tests passing
+- [ ] Cucumber: All scenarios passing
+- [ ] Capybara: All features passing
+
+**Documentation:**
+- [ ] README complete with setup instructions
+- [ ] YARD docs generated for all public methods
+- [ ] ADRs written for major decisions
+- [ ] Testing guide available
+- [ ] Demo script prepared
+
+---
+
+## Appendix A: Technology Decision Matrix
+
+| Technology | Alternatives Considered | Decision Rationale |
+|------------|-------------------------|-------------------|
+| Rails 7.1 | Sinatra, Hanami | Industry standard, robust ecosystem, demo-appropriate |
+| RSpec | Minitest | More expressive syntax, better for showcasing skills |
+| Capybara | Selenium raw | Higher-level API, better for maintainability |
+| Cucumber | RSpec features only | BDD demonstration value, business-readable |
+| SimpleCov | Coverband | Appropriate for test environment coverage |
+| SQLite | PostgreSQL | Simpler setup for demo, easily migrated later |
+| ERB | Slim, Haml | Standard Rails, familiar to all developers |
+
+---
+
+## Appendix B: Future Enhancements
+
+### Phase 2: Advanced Features
+- JWT-based REST API
+- Real-time threat intelligence integration
+- Machine learning model training
+- Webhook notifications
+- Multi-user authentication
+- Role-based access control
+
+### Phase 3: Enterprise Features
+- SSO/SAML integration
+- Multi-tenancy support
+- Advanced analytics and reporting
+- Custom detection rule builder
+- Integration with SIEM platforms
+- Email parsing from .eml/.msg files
+
+---
+
+## Approval
+
+This ARD defines the technical architecture for PhishingLab MVP. Implementation should follow these guidelines while maintaining flexibility for improvements discovered during development.
+
+**Next Steps:**
+1. Review and validate ARD
+2. Begin project scaffolding (workflow.mdc Stage 2)
+3. Implement iteratively following TDD approach
+
+---
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2025-12-11 | Development Team | Initial draft |

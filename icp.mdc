@@ -1,0 +1,430 @@
+# Ideal Customer Profile (ICP)
+
+## Document Purpose
+This document defines the ideal customer profile for PhishingLab, informing feature prioritization, UX decisions, and demo presentation strategy.
+
+---
+
+## Primary ICP: Enterprise Email Security Stakeholders
+
+### Company Profile
+
+**Industry:**
+- Financial Services
+- Healthcare
+- Technology/SaaS
+- Government/Public Sector
+- Professional Services
+- Any enterprise with compliance requirements (HIPAA, SOC2, PCI-DSS)
+
+**Company Size:**
+- 500+ employees
+- Distributed workforce (remote/hybrid)
+- Multiple departments with varying security awareness levels
+
+**Technology Environment:**
+- Microsoft 365 / Google Workspace
+- Existing email security gateway (Proofpoint, Mimecast, Barracuda)
+- SIEM/SOC infrastructure
+- Security awareness training programs
+
+**Security Maturity:**
+- Established security team (5+ members)
+- Regular phishing simulations
+- Incident response procedures in place
+- Compliance requirements mandate email security
+
+---
+
+### Persona 1: Director of Quality Assurance (Primary Target)
+
+**Demographics:**
+- **Title:** Director of QA, QA Manager, Head of Quality Engineering
+- **Reports to:** VP of Engineering, CTO
+- **Team size:** 5-15 QA engineers
+- **Experience:** 8-15 years in software testing
+
+**Responsibilities:**
+- Ensuring comprehensive test coverage across products
+- Defining testing standards and best practices
+- Evaluating and hiring SDET talent
+- Selecting testing tools and frameworks
+- Balancing automation vs. manual testing
+- Reporting quality metrics to leadership
+
+**Goals:**
+- Hire SDETs who can design robust test frameworks
+- Demonstrate testing ROI to executive leadership
+- Reduce production bugs through better testing
+- Scale testing capabilities as product grows
+- Maintain high velocity without sacrificing quality
+
+**Pain Points:**
+- Difficulty finding SDETs with strong architectural skills
+- Candidates can write tests but not design test systems
+- Need to assess real-world problem-solving ability
+- Resume inflation makes evaluation challenging
+- Limited time for thorough technical assessments
+
+**Decision Criteria (for SDET Candidates):**
+- Can they design a test strategy from scratch?
+- Do they understand SOLID principles and clean architecture?
+- Can they choose appropriate testing tools for the job?
+- Do they write maintainable, readable test code?
+- Can they explain trade-offs between testing approaches?
+- Do they think about edge cases and failure scenarios?
+
+**What Impresses Them:**
+- Complete test coverage with clear documentation
+- Well-organized test suites following industry standards
+- Thoughtful architectural decisions (documented via ADRs)
+- Clean separation of concerns in test code
+- BDD scenarios that non-technical stakeholders can read
+- Realistic demo data showing thorough analysis
+- Proactive testing of edge cases
+
+**What Concerns Them:**
+- Over-engineered solutions for simple problems
+- Tests that are hard to maintain
+- Poor code organization
+- Missing test coverage
+- Copy-pasted test code without understanding
+- Inability to explain testing choices
+
+---
+
+### Persona 2: Chief Information Security Officer (CISO)
+
+**Demographics:**
+- **Title:** CISO, VP of Security, Director of Information Security
+- **Reports to:** CEO, CTO, or Board
+- **Team size:** 10-50 security professionals
+- **Experience:** 12-20 years in cybersecurity
+
+**Responsibilities:**
+- Overall security strategy and risk management
+- Compliance and regulatory adherence
+- Security tool selection and budget allocation
+- Incident response oversight
+- Security awareness and training programs
+- Board-level security reporting
+
+**Goals:**
+- Reduce successful phishing attacks
+- Improve employee security awareness
+- Meet compliance requirements (SOC2, ISO 27001, etc.)
+- Demonstrate security program effectiveness
+- Optimize security tool spending
+- Minimize time-to-detection for threats
+
+**Pain Points:**
+- Employees still fall for sophisticated phishing
+- False positives overwhelm security team
+- Existing tools miss advanced threats
+- Difficult to measure training effectiveness
+- Need to justify security spending to CFO
+- Alert fatigue from multiple security tools
+
+**Decision Criteria (for Security Tools):**
+- Does it reduce mean-time-to-detect (MTTD)?
+- Can it integrate with existing security stack?
+- What's the false positive rate?
+- Does it improve employee behavior over time?
+- Can we demonstrate ROI to the board?
+- Does it meet compliance requirements?
+
+**What Impresses Them:**
+- Realistic threat detection capabilities
+- Clear threat scoring methodology
+- Metrics-driven approach (false positives, detection rates)
+- Human-in-the-loop validation (like Cofense)
+- Scalable to large employee populations
+- Integration points with SIEM/SOC tools
+
+---
+
+### Persona 3: Security Operations Manager
+
+**Demographics:**
+- **Title:** SOC Manager, Security Operations Lead, Threat Response Manager
+- **Reports to:** CISO, Director of Security
+- **Team size:** 5-15 security analysts
+- **Experience:** 7-12 years in security operations
+
+**Responsibilities:**
+- Day-to-day security operations
+- Phishing incident response
+- Triaging security alerts
+- Managing security analyst workload
+- Reporting on security metrics
+- Coordinating with IT on remediation
+
+**Goals:**
+- Reduce false positive alerts
+- Speed up phishing investigation time
+- Empower analysts with better tools
+- Automate repetitive triage tasks
+- Improve threat intelligence quality
+- Demonstrate team efficiency
+
+**Pain Points:**
+- Overwhelmed with user-reported emails
+- Manual analysis is time-consuming
+- Hard to prioritize which alerts to investigate first
+- Lack of actionable threat intelligence
+- Analysts burn out on repetitive tasks
+- Difficult to track response metrics
+
+**Decision Criteria (for Security Tools):**
+- Does it reduce analyst workload?
+- How accurate is the automated analysis?
+- Can it prioritize threats effectively?
+- Does it integrate with our ticketing system?
+- Can we customize detection rules?
+- What's the learning curve for analysts?
+
+**What Impresses Them:**
+- Automated phishing indicator extraction
+- Clear prioritization/scoring system
+- Detailed analysis breakdown
+- Actionable response recommendations
+- Reporting and analytics dashboard
+- Ability to track response metrics
+
+---
+
+## Secondary ICP: Training & Awareness Teams
+
+### Persona 4: Security Awareness Manager
+
+**Demographics:**
+- **Title:** Security Awareness Manager, Training Coordinator
+- **Reports to:** CISO, HRIS Director
+- **Team size:** 2-5 trainers
+- **Experience:** 5-10 years in L&D or security
+
+**Responsibilities:**
+- Security awareness training programs
+- Phishing simulation campaigns
+- Measuring training effectiveness
+- Compliance training tracking
+- Creating security education content
+- Reporting to leadership on awareness metrics
+
+**Goals:**
+- Reduce click-through rates on phishing simulations
+- Improve employee reporting of suspicious emails
+- Demonstrate training ROI
+- Make training engaging and effective
+- Meet compliance training requirements
+
+**Pain Points:**
+- Employees complain training is boring
+- Hard to measure behavior change
+- Repeat offenders continue falling for phishing
+- Need fresh, realistic phishing examples
+- Reporting is time-consuming
+
+**Decision Criteria (for Training Tools):**
+- Does it provide realistic phishing scenarios?
+- Can we track individual employee progress?
+- Does it show measurable behavior improvement?
+- Can we customize campaigns to our industry?
+- What reporting capabilities does it have?
+
+**What Impresses Them:**
+- Realistic, up-to-date phishing examples
+- Granular tracking of employee interactions
+- Clear metrics on improvement over time
+- Ability to identify high-risk departments
+- Automated reporting for compliance
+
+---
+
+## Use Case Scenarios
+
+### Scenario 1: SDET Interview Demo
+**Context:** Director of QA is interviewing SDET candidate
+
+**Workflow:**
+1. Candidate presents PhishingLab as portfolio project
+2. Walks through codebase structure showing SOLID principles
+3. Demonstrates test coverage (100%) via SimpleCov
+4. Shows Cucumber features as business-readable specs
+5. Runs test suite showing all tests passing
+6. Explains architectural decisions via ADRs
+7. Demonstrates live detection of phishing email in UI
+
+**Success Metrics:**
+- Director sees organized, maintainable test code
+- Candidate can explain testing trade-offs
+- Clear demonstration of BDD approach
+- Shows understanding of real-world security domain
+
+---
+
+### Scenario 2: Security Tool Evaluation
+**Context:** CISO evaluating phishing detection platforms
+
+**Workflow:**
+1. Security team receives demo access
+2. Uploads sample phishing emails to inbox
+3. Reviews automated analysis and threat scores
+4. Examines false positive rate on legitimate emails
+5. Checks admin dashboard for reporting capabilities
+6. Evaluates integration potential with existing tools
+
+**Success Metrics:**
+- Accurate detection of phishing indicators
+- Low false positive rate
+- Clear, actionable threat scoring
+- Comprehensive analytics dashboard
+
+---
+
+### Scenario 3: SOC Workflow Optimization
+**Context:** SOC Manager testing phishing triage tool
+
+**Workflow:**
+1. User reports suspicious email via interface
+2. System automatically analyzes email
+3. Phishing indicators are highlighted
+4. Threat score helps prioritize investigation
+5. Analyst reviews analysis results
+6. Remediation actions are tracked
+
+**Success Metrics:**
+- Reduces manual analysis time
+- Helps prioritize high-risk emails
+- Provides clear audit trail
+- Integrates with existing workflow
+
+---
+
+## Feature Prioritization Based on ICP
+
+### Must-Have (MVP)
+- Realistic inbox simulator
+- Automated phishing detection
+- Clear indicator highlighting
+- Threat scoring system
+- User reporting workflow
+- Admin dashboard with metrics
+
+### Should-Have (Post-MVP)
+- Export functionality (CSV/JSON)
+- Custom detection rule configuration
+- Integration API endpoints
+- Bulk email upload
+- Historical trend analysis
+
+### Nice-to-Have (Future)
+- Real-time threat intelligence integration
+- Machine learning model training
+- Multi-language support
+- Mobile responsive design
+- SSO/SAML integration
+
+---
+
+## Competitive Landscape
+
+### Direct Competitors
+- **Cofense PhishMe:** Enterprise phishing defense platform
+- **KnowBe4:** Security awareness training with simulations
+- **Proofpoint:** Email security and threat protection
+- **Mimecast:** Email security and archiving
+
+### PhishingLab Positioning
+**For:** QA Directors evaluating SDET candidates and security teams evaluating detection tools
+
+**Who:** Need to assess test engineering skills and phishing detection capabilities
+
+**PhishingLab is:** A demonstration platform showing enterprise-grade testing practices
+
+**That:** Showcases comprehensive test coverage, SOLID architecture, and realistic phishing detection
+
+**Unlike:** Generic todo apps or simple CRUD demos
+
+**Our solution:** Demonstrates real-world security domain knowledge with professional engineering practices
+
+---
+
+## Success Criteria for Demo
+
+### Technical Excellence (QA Director Perspective)
+- [ ] 100% test coverage shown via SimpleCov
+- [ ] Clean architecture with SOLID principles
+- [ ] Comprehensive BDD scenarios in Cucumber
+- [ ] Well-organized codebase structure
+- [ ] Professional documentation
+
+### Functional Credibility (Security Perspective)
+- [ ] Realistic phishing indicators detected
+- [ ] Accurate threat scoring
+- [ ] Relevant security use cases
+- [ ] Industry-appropriate terminology
+- [ ] Demonstrates domain knowledge
+
+### Presentation Impact
+- [ ] Clean, professional UI
+- [ ] Smooth demo flow
+- [ ] Clear value proposition
+- [ ] Impressive attention to detail
+- [ ] Shows strategic thinking
+
+---
+
+## Key Messages for Demo
+
+### For QA Directors
+1. "This demonstrates my approach to building testable, maintainable systems"
+2. "I follow SOLID principles and clean architecture patterns"
+3. "I use BDD to ensure tests are readable by non-technical stakeholders"
+4. "100% test coverage isn't just a metric—it's a discipline"
+5. "I chose this domain to show I can understand complex business requirements"
+
+### For Security Stakeholders
+1. "I researched Cofense's approach to understand enterprise phishing defense"
+2. "The detection engine identifies real-world phishing indicators"
+3. "Threat scoring helps prioritize analyst time on high-risk emails"
+4. "The admin dashboard provides actionable metrics"
+5. "This shows my ability to quickly understand a technical domain"
+
+---
+
+## Anti-Patterns to Avoid
+
+### Technical Anti-Patterns
+- ❌ Over-engineering with unnecessary complexity
+- ❌ Using buzzwords without understanding
+- ❌ Poor test organization or missing coverage
+- ❌ Inconsistent code style
+- ❌ Lack of documentation
+
+### Domain Anti-Patterns
+- ❌ Unrealistic phishing detection (too simple or too complex)
+- ❌ Using incorrect security terminology
+- ❌ Ignoring real-world constraints
+- ❌ Missing obvious security vulnerabilities
+- ❌ Oversimplifying the problem space
+
+### Presentation Anti-Patterns
+- ❌ Apologizing for missing features
+- ❌ Focusing on technologies instead of value
+- ❌ Not connecting to business problems
+- ❌ Being unable to explain design decisions
+- ❌ Dismissing questions or criticism
+
+---
+
+## Conclusion
+
+PhishingLab's ICP centers on **technical evaluators** (QA Directors) and **security practitioners** (CISOs, SOC Managers) who value:
+
+1. **Engineering Excellence:** Clean code, SOLID principles, comprehensive testing
+2. **Domain Understanding:** Realistic security scenarios, industry knowledge
+3. **Professional Presentation:** Clear documentation, smooth demo, confident delivery
+4. **Strategic Thinking:** Thoughtful architecture decisions, scalability considerations
+
+Success means demonstrating you can design and build enterprise-grade systems while deeply understanding the problem domain.

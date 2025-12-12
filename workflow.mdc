@@ -1,0 +1,274 @@
+# PhishingLab Development Workflow
+
+## Project Overview
+PhishingLab is a phishing email analysis and reporting simulator demonstrating enterprise-grade email security testing capabilities, built with Ruby on Rails, Capybara, RSpec, and Cucumber.
+
+## Development Workflow Stages
+
+### Stage 1: Foundation & Planning
+**Status:** In Progress
+
+**Deliverables:**
+- [x] workflow.mdc - Project workflow definition
+- [x] folder-structure.mdc - Project architecture blueprint
+- [x] icp.mdc - Ideal Customer Profile
+- [x] brd.mdc - Business Requirements Document
+- [x] ard.mdc - Architecture Requirements Document
+
+**Next Steps:**
+- Review and validate all foundational documents
+- Obtain stakeholder approval on architecture approach
+
+---
+
+### Stage 2: Project Scaffolding
+**Status:** Pending
+
+**Activities:**
+1. Initialize Rails application with required gems
+2. Configure RSpec, Capybara, Cucumber, SimpleCov
+3. Create folder structure per folder-structure.mdc
+4. Set up CI/CD pipeline configuration
+5. Configure database (SQLite for development, PostgreSQL-ready for production)
+6. Initialize Git repository with proper .gitignore
+
+**Deliverables:**
+- Fully configured Rails application
+- Test framework setup with initial passing tests
+- README.md with setup instructions
+
+---
+
+### Stage 3: Core Domain Modeling
+**Status:** Pending
+
+**Activities:**
+1. Create database migrations for core entities (Emails, PhishingIndicators, Reports, ThreatScores)
+2. Implement ActiveRecord models with validations
+3. Write model unit tests (RSpec)
+4. Implement service objects following SOLID principles
+5. Create factory definitions for test data (FactoryBot)
+
+**Deliverables:**
+- Complete domain model layer
+- 100% test coverage for models
+- Service objects for business logic
+
+---
+
+### Stage 4: Email Analysis Engine
+**Status:** Pending
+
+**Activities:**
+1. Implement PhishingDetectionService
+2. Build indicator analysis modules:
+   - URL reputation checker
+   - Sender authentication validator
+   - Content pattern analyzer
+   - Attachment risk assessor
+3. Create ThreatScoringEngine
+4. Write comprehensive RSpec tests
+5. Implement Cucumber scenarios for detection workflows
+
+**Deliverables:**
+- Functional phishing detection engine
+- Configurable threat scoring algorithm
+- BDD feature files with passing scenarios
+
+---
+
+### Stage 5: User Interface Development
+**Status:** Pending
+
+**Activities:**
+1. Create inbox simulator UI (ERB/Hotwire)
+2. Build email detail view with indicator highlighting
+3. Implement reporting workflow interface
+4. Create admin dashboard
+5. Write Capybara feature specs
+6. Ensure responsive design
+
+**Deliverables:**
+- Complete UI for all user workflows
+- Capybara integration tests
+- Accessible, responsive interface
+
+---
+
+### Stage 6: Admin Dashboard & Analytics
+**Status:** Pending
+
+**Activities:**
+1. Build threat distribution visualizations
+2. Implement reporting metrics
+3. Create false positive tracking interface
+4. Build export functionality (CSV/JSON)
+5. Write integration tests
+
+**Deliverables:**
+- Functional admin dashboard
+- Analytics and reporting features
+- Export capabilities
+
+---
+
+### Stage 7: Testing & Quality Assurance
+**Status:** Pending
+
+**Activities:**
+1. Achieve 100% test coverage (SimpleCov validation)
+2. Perform edge case testing
+3. Load/performance testing
+4. Security testing (OWASP top 10)
+5. Accessibility audit
+6. Code review for SOLID compliance
+
+**Quality Gates:**
+- SimpleCov: 100% coverage
+- RSpec: All unit/integration tests passing
+- Cucumber: All BDD scenarios passing
+- Capybara: All feature specs passing
+- RuboCop: No violations
+- Brakeman: No security warnings
+
+---
+
+### Stage 8: Documentation
+**Status:** Pending
+
+**Activities:**
+1. Generate API documentation (YARD)
+2. Write user guide
+3. Create testing guide
+4. Document architecture decisions (ADRs)
+5. Create demo walkthrough script
+6. Record demo video (optional)
+
+**Deliverables:**
+- Comprehensive README.md
+- API documentation
+- Testing documentation
+- Architecture Decision Records
+- Demo presentation materials
+
+---
+
+### Stage 9: Demo Preparation
+**Status:** Pending
+
+**Activities:**
+1. Seed realistic demo data
+2. Create demo user accounts
+3. Prepare presentation talking points
+4. Practice demo flow
+5. Create backup deployment (Heroku/Railway)
+
+**Deliverables:**
+- Production-ready demo environment
+- Seeded realistic data
+- Demo script and talking points
+
+---
+
+## Development Principles
+
+### SOLID Standards
+- **Single Responsibility:** Each class has one reason to change
+- **Open/Closed:** Open for extension, closed for modification
+- **Liskov Substitution:** Subtypes must be substitutable for base types
+- **Interface Segregation:** Many specific interfaces over one general interface
+- **Dependency Inversion:** Depend on abstractions, not concretions
+
+### Testing Strategy
+- **Unit Tests (RSpec):** All models, services, helpers
+- **Integration Tests (RSpec):** API endpoints, service interactions
+- **Feature Tests (Capybara):** User workflows, UI interactions
+- **BDD Scenarios (Cucumber):** Business-readable acceptance criteria
+- **Coverage Target:** 100% (SimpleCov)
+
+### Code Quality
+- Follow Ruby Style Guide (enforced via RuboCop)
+- Use design patterns appropriately (Repository, Service Object, Decorator)
+- Maintain clear separation of concerns
+- Write self-documenting code with meaningful names
+- Add comments only for complex business logic
+
+### Git Workflow
+- Feature branch workflow
+- Descriptive commit messages
+- PR-based reviews (self-review for demo)
+- Keep commits atomic and focused
+
+---
+
+## Risk Management
+
+### Technical Risks
+- **Risk:** Complex phishing detection logic
+  - **Mitigation:** Break into small, testable modules with clear interfaces
+
+- **Risk:** Test coverage gaps
+  - **Mitigation:** TDD approach, SimpleCov enforcement, regular coverage audits
+
+- **Risk:** Performance issues with large datasets
+  - **Mitigation:** Early performance testing, database indexing, pagination
+
+### Schedule Risks
+- **Risk:** Scope creep
+  - **Mitigation:** Strict adherence to BRD, defer nice-to-haves to backlog
+
+- **Risk:** Unforeseen complexity
+  - **Mitigation:** Time-boxed spikes, MVP-first approach
+
+---
+
+## Success Criteria
+
+### Technical Excellence
+- [ ] 100% test coverage achieved
+- [ ] All tests passing (RSpec, Cucumber, Capybara)
+- [ ] Zero security vulnerabilities (Brakeman scan)
+- [ ] Zero style violations (RuboCop)
+- [ ] SOLID principles demonstrated throughout codebase
+
+### Functional Completeness
+- [ ] All BRD requirements implemented
+- [ ] Demo-ready with realistic data
+- [ ] Clear documentation for all features
+- [ ] Admin dashboard fully functional
+
+### Demo Readiness
+- [ ] Impressive visual presentation
+- [ ] Smooth user experience
+- [ ] Clear demonstration of testing expertise
+- [ ] Professional documentation
+- [ ] Deployable to production environment
+
+---
+
+## Timeline Estimates
+
+**Note:** These are guideline estimates for planning purposes
+
+- Stage 1 (Foundation): Current
+- Stage 2 (Scaffolding): 2-3 hours
+- Stage 3 (Domain Modeling): 4-6 hours
+- Stage 4 (Analysis Engine): 6-8 hours
+- Stage 5 (UI Development): 6-8 hours
+- Stage 6 (Dashboard): 4-5 hours
+- Stage 7 (Testing & QA): 4-6 hours
+- Stage 8 (Documentation): 3-4 hours
+- Stage 9 (Demo Prep): 2-3 hours
+
+**Total Estimated Effort:** 31-43 hours
+
+---
+
+## References
+
+- [BRD](brd.mdc) - Business Requirements
+- [ARD](ard.mdc) - Architecture Requirements
+- [ICP](icp.mdc) - Ideal Customer Profile
+- [Folder Structure](folder-structure.mdc) - Project Organization
+- [Cofense Website](https://cofense.com)
+- [Cofense Phishing Examples](https://cofense.com/knowledge-center-hub/real-phishing-email-examples)

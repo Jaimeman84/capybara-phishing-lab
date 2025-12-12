@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ruby:*)",
+      "Bash(rails --version:*)",
+      "Bash(bundle install:*)",
+      "Bash(rails new:*)",
+      "Bash(bundle exec rails:*)",
+      "Bash(rails generate:*)",
+      "Bash(rails db:create:*)",
+      "Bash(rails db:migrate:*)",
+      "Bash(bundle exec rubocop:*)",
+      "Bash(bundle exec brakeman:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

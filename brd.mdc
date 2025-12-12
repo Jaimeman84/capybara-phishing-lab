@@ -1,0 +1,914 @@
+# Business Requirements Document (BRD)
+
+## Document Control
+
+| Field | Value |
+|-------|-------|
+| Project Name | PhishingLab - Email Security Analysis Simulator |
+| Document Version | 1.0 |
+| Created Date | 2025-12-11 |
+| Document Owner | Development Team |
+| Status | Draft |
+
+---
+
+## Executive Summary
+
+### Project Overview
+PhishingLab is a demonstration platform that simulates an enterprise phishing email analysis and reporting system. The platform showcases professional software engineering practices, comprehensive test coverage, and domain expertise in email security.
+
+### Business Objective
+Create a portfolio demonstration project that:
+1. Showcases SDET skills including test design, automation, and quality engineering
+2. Demonstrates understanding of SOLID principles and clean architecture
+3. Proves ability to work with modern Ruby testing frameworks (RSpec, Capybara, Cucumber)
+4. Shows domain knowledge in email security and phishing detection
+5. Provides an impressive, professional demo for technical interviews
+
+### Target Audience
+- **Primary:** QA Directors and Engineering Managers evaluating SDET candidates
+- **Secondary:** Security professionals evaluating phishing detection capabilities
+- **Tertiary:** Technical recruiters assessing engineering quality
+
+### Success Criteria
+- 100% test coverage (verified via SimpleCov)
+- All tests passing (RSpec, Cucumber, Capybara)
+- Professional UI with realistic phishing scenarios
+- Clear documentation demonstrating architectural decisions
+- Zero critical security vulnerabilities (verified via Brakeman)
+- Demo can be completed in 10-15 minutes
+
+---
+
+## Business Context
+
+### Problem Statement
+Technical interviews often fail to assess real-world engineering skills:
+- Coding challenges test algorithm knowledge, not system design
+- Take-home assignments are often simple CRUD applications
+- Candidates struggle to demonstrate testing expertise
+- Security domain knowledge is hard to showcase in generic demos
+
+### Solution
+PhishingLab addresses these gaps by:
+- Providing a realistic business domain (email security)
+- Demonstrating comprehensive testing at all levels
+- Showing clean architecture and SOLID principles in practice
+- Proving ability to understand complex requirements
+- Creating an impressive visual demonstration
+
+### Business Value
+**For the Candidate:**
+- Stands out in competitive SDET job market
+- Demonstrates senior-level engineering skills
+- Shows initiative and passion for quality
+- Provides talking points for technical discussions
+- Reusable for multiple interviews/opportunities
+
+**For the Hiring Manager:**
+- Reduces candidate evaluation time
+- Provides concrete evidence of skills
+- Enables meaningful technical discussions
+- Reduces hiring risk through proof of capability
+
+---
+
+## Scope
+
+### In Scope
+
+#### Phase 1: MVP (Minimum Viable Product)
+**User-Facing Features:**
+1. Email inbox simulator displaying mixed legitimate and phishing emails
+2. Email detail view with sender, subject, body, and attachments
+3. Phishing email reporting workflow
+4. Automated analysis showing detected indicators
+5. Threat score display with risk level
+6. Admin dashboard showing threat analytics
+
+**Technical Features:**
+1. Automated phishing detection engine
+2. URL reputation analysis
+3. Sender authentication checking
+4. Content pattern matching (urgency, credentials, spoofing)
+5. Attachment risk assessment
+6. Threat scoring algorithm
+7. Database persistence for emails, reports, and analysis results
+
+**Testing Features:**
+1. RSpec unit tests for all models and services
+2. RSpec integration tests for controllers
+3. Capybara feature tests for user workflows
+4. Cucumber BDD scenarios for acceptance criteria
+5. SimpleCov reporting with 100% coverage
+6. FactoryBot factories for test data
+
+**Documentation:**
+1. README with setup instructions
+2. Architecture Decision Records (ADRs)
+3. YARD API documentation
+4. Testing guide
+5. Demo script
+
+### Out of Scope (Future Enhancements)
+
+**Phase 2 (Post-Demo):**
+- Real-time threat intelligence API integration
+- Machine learning model training
+- Email parsing from .eml files
+- Multi-user authentication and authorization
+- Bulk email upload/import
+- REST API for external integrations
+- Webhook notifications for high-risk emails
+
+**Phase 3 (Advanced Features):**
+- Real-time collaboration features
+- Custom detection rule builder
+- A/B testing framework for detection algorithms
+- Multi-language support
+- Advanced reporting and data export
+- Integration with actual email providers
+
+### Assumptions
+1. Demo data will be seeded via Rails seeds, not imported from real emails
+2. No actual email sending/receiving capabilities required
+3. Single-user system (no authentication required for MVP)
+4. SQLite database sufficient for demo purposes
+5. No production deployment required (local development environment)
+6. Detection algorithms will be rule-based, not ML-based (for explainability)
+
+### Constraints
+1. **Time:** Target completion within 30-40 hours of development
+2. **Technology Stack:** Must use Rails, RSpec, Capybara, Cucumber, SimpleCov
+3. **Coverage:** 100% test coverage is non-negotiable
+4. **Security:** No actual vulnerabilities can exist (checked via Brakeman)
+5. **Documentation:** Must be professional-grade
+
+---
+
+## Functional Requirements
+
+### FR-1: Email Inbox Simulation
+
+**Priority:** Must Have
+
+**Description:**
+Display a realistic corporate email inbox containing a mix of legitimate and phishing emails.
+
+**Acceptance Criteria:**
+```gherkin
+Given I am on the inbox page
+When the page loads
+Then I should see a list of emails
+And each email should display sender, subject, and preview
+And emails should be sorted by date (newest first)
+And I should see both legitimate and suspicious emails
+```
+
+**User Stories:**
+- As a user, I want to view my email inbox so that I can identify potential phishing threats
+- As a demo viewer, I want realistic email data so that I can evaluate the detection capabilities
+
+**Business Rules:**
+- Minimum 20 emails in seed data
+- At least 40% should be phishing emails
+- At least 10% should be edge cases (legitimate with suspicious traits)
+- Emails must represent diverse phishing tactics (credential harvest, malware, social engineering)
+
+**UI Requirements:**
+- Responsive table/list view
+- Visual indicators for flagged emails (optional)
+- Clickable rows to view email details
+
+---
+
+### FR-2: Email Detail View
+
+**Priority:** Must Have
+
+**Description:**
+Display full email content including sender, subject, body, headers, and attachments.
+
+**Acceptance Criteria:**
+```gherkin
+Given I am viewing the inbox
+When I click on an email
+Then I should see the full email details
+And I should see sender information
+And I should see the subject line
+And I should see the email body (HTML and/or plain text)
+And I should see any attachments
+And I should see a "Report Phishing" button
+```
+
+**User Stories:**
+- As a user, I want to read email content so that I can determine if it's suspicious
+- As a security analyst, I want to see email headers so that I can verify sender authenticity
+
+**Business Rules:**
+- Support both HTML and plain text email bodies
+- Display attachments with file name and type
+- Preserve email formatting for realism
+
+**UI Requirements:**
+- Clean, readable email layout
+- Proper HTML rendering with XSS protection
+- Attachment icons/badges
+- Clear call-to-action for reporting
+
+---
+
+### FR-3: Phishing Email Reporting
+
+**Priority:** Must Have
+
+**Description:**
+Allow users to report suspicious emails for analysis.
+
+**Acceptance Criteria:**
+```gherkin
+Given I am viewing an email
+When I click "Report Phishing"
+Then the email should be submitted for analysis
+And I should see a confirmation message
+And the email should be marked as reported
+And analysis should be triggered automatically
+```
+
+**User Stories:**
+- As a user, I want to report suspicious emails so that they can be investigated
+- As a security team, I want users to easily report phishing so we can respond quickly
+
+**Business Rules:**
+- One report per email per user (idempotent)
+- Reporting triggers automated analysis
+- Users receive immediate feedback
+- Reported emails are logged with timestamp
+
+**UI Requirements:**
+- Prominent "Report Phishing" button
+- Confirmation dialog (optional)
+- Success/error messaging
+- Visual indication of reported status
+
+---
+
+### FR-4: Automated Phishing Detection
+
+**Priority:** Must Have
+
+**Description:**
+Automatically analyze reported emails for phishing indicators across multiple dimensions.
+
+**Acceptance Criteria:**
+```gherkin
+Given an email has been reported as phishing
+When the analysis engine processes it
+Then it should check for suspicious URLs
+And it should validate sender authentication
+And it should scan content for phishing patterns
+And it should assess attachment risks
+And it should generate a list of detected indicators
+```
+
+**User Stories:**
+- As a security analyst, I want automated detection so that I can quickly identify threats
+- As a SOC manager, I want comprehensive analysis so that I can prioritize investigations
+
+**Business Rules:**
+- Analysis must complete within 5 seconds (for demo purposes)
+- All four analysis types must run (URL, sender, content, attachment)
+- Each indicator must include description and severity
+- Analysis results must be persisted to database
+
+**Detection Categories:**
+
+**4.1 URL Analysis**
+- Check for suspicious TLDs (.tk, .ml, .ga, etc.)
+- Detect shortened URLs (bit.ly, tinyurl, etc.)
+- Identify homoglyph attacks (using similar characters)
+- Check for IP-based URLs
+- Detect mismatched display text vs. actual URL
+
+**4.2 Sender Authentication**
+- Validate email domain
+- Check for spoofed "From" addresses
+- Identify free email providers masquerading as corporate
+- Detect look-alike domains (microsof.com vs. microsoft.com)
+
+**4.3 Content Pattern Matching**
+- Urgency language ("Act now!", "Urgent action required")
+- Credential requests ("Verify your password", "Update payment info")
+- Generic greetings ("Dear customer" vs. personalized)
+- Spelling/grammar errors (configurable sensitivity)
+- Suspicious keywords ("prize", "winner", "suspended account")
+
+**4.4 Attachment Risk Assessment**
+- Executable file types (.exe, .scr, .bat, etc.)
+- Archive files with suspicious extensions (.zip, .rar)
+- Office documents with macros
+- Password-protected archives
+- Suspicious file names
+
+---
+
+### FR-5: Threat Scoring
+
+**Priority:** Must Have
+
+**Description:**
+Calculate an overall threat score based on detected indicators.
+
+**Acceptance Criteria:**
+```gherkin
+Given an email has been analyzed
+When indicators have been detected
+Then a threat score should be calculated
+And the score should be between 0 and 100
+And the risk level should be categorized (Low/Medium/High/Critical)
+And the score should be explainable based on indicators
+```
+
+**User Stories:**
+- As a security analyst, I want prioritized threat scores so that I can investigate high-risk emails first
+- As a demo viewer, I want to understand the scoring logic so that I can evaluate the algorithm
+
+**Business Rules:**
+- Score range: 0-100
+- Risk levels:
+  - 0-25: Low Risk
+  - 26-50: Medium Risk
+  - 51-75: High Risk
+  - 76-100: Critical Risk
+- Each indicator contributes points based on severity
+- Score must be deterministic (same inputs = same score)
+
+**Scoring Algorithm (Configurable Weights):**
+- Suspicious URL: +15 points each
+- Sender authentication failure: +25 points
+- Urgency language: +10 points
+- Credential request: +20 points
+- Generic greeting: +5 points
+- Executable attachment: +30 points
+- Office doc with macros: +20 points
+
+---
+
+### FR-6: Analysis Results Display
+
+**Priority:** Must Have
+
+**Description:**
+Present analysis results in a clear, actionable format.
+
+**Acceptance Criteria:**
+```gherkin
+Given an email has been analyzed
+When I view the analysis results
+Then I should see the overall threat score
+And I should see the risk level category
+And I should see a list of detected indicators
+And each indicator should show its type and description
+And I should see why the indicator is suspicious
+```
+
+**User Stories:**
+- As a user, I want to understand why an email is phishing so that I can learn to recognize threats
+- As a security analyst, I want detailed indicators so that I can make informed decisions
+
+**Business Rules:**
+- Results must be human-readable
+- Each indicator must include rationale
+- Results should be visually organized by category
+- Empty categories should show "No issues detected"
+
+**UI Requirements:**
+- Color-coded risk levels (green/yellow/orange/red)
+- Grouped indicators by type (URL/Sender/Content/Attachment)
+- Expandable details for each indicator
+- Visual distinction between high and low severity indicators
+
+---
+
+### FR-7: Admin Dashboard
+
+**Priority:** Must Have
+
+**Description:**
+Provide an administrative view showing threat analytics and reporting metrics.
+
+**Acceptance Criteria:**
+```gherkin
+Given I am on the admin dashboard
+When the page loads
+Then I should see total emails count
+And I should see total reports count
+And I should see threat distribution by risk level
+And I should see most common indicators
+And I should see detection accuracy metrics
+```
+
+**User Stories:**
+- As a security manager, I want analytics so that I can understand threat trends
+- As a demo viewer, I want to see metrics so that I can evaluate system effectiveness
+
+**Business Rules:**
+- All metrics should update dynamically based on database state
+- Charts should be responsive and readable
+- Data should be accurate (no fake/mocked data)
+
+**Dashboard Widgets:**
+1. **Summary Statistics**
+   - Total emails processed
+   - Total reports submitted
+   - Emails flagged as phishing
+   - Average threat score
+
+2. **Threat Distribution**
+   - Pie chart: Low/Medium/High/Critical emails
+   - Bar chart: Emails by phishing type
+
+3. **Common Indicators**
+   - Top 10 most detected indicators
+   - Frequency count for each
+
+4. **Detection Metrics**
+   - True positives (phishing correctly identified)
+   - False positives (legitimate flagged as phishing)
+   - Precision/Recall (if ground truth available)
+
+---
+
+### FR-8: Data Seeding
+
+**Priority:** Must Have
+
+**Description:**
+Populate database with realistic demo data covering diverse phishing scenarios.
+
+**Acceptance Criteria:**
+```gherkin
+Given I run the database seed command
+When the seeding process completes
+Then the database should contain sample emails
+And emails should represent diverse phishing types
+And emails should include edge cases
+And all emails should have realistic content
+```
+
+**Seed Data Requirements:**
+
+**Email Categories (Minimum Counts):**
+- Legitimate emails: 12
+- Credential harvesting phishing: 4
+- Malware delivery phishing: 3
+- Social engineering phishing: 3
+- Business Email Compromise (BEC): 2
+- Edge cases (legitimate with suspicious traits): 3
+
+**Phishing Examples (Based on Cofense Research):**
+1. **Credential Harvesting:**
+   - Fake Microsoft/Google login prompts
+   - Fake ChatGPT account verification
+   - Fake banking security alerts
+   - Fake IT helpdesk password reset
+
+2. **Malware Delivery:**
+   - Fake invoice with malicious attachment
+   - Fake delivery notification with download link
+   - Fake resume/job application with .exe
+   - Fake tax document with macro-enabled Excel
+
+3. **Social Engineering:**
+   - Fake meeting invitations
+   - Fake shared document notifications
+   - Fake prize/gift card offers
+   - Fake urgent CEO requests (BEC)
+
+4. **Edge Cases:**
+   - Legitimate marketing email with urgent language
+   - Legitimate password reset from real service
+   - Legitimate email from new domain
+   - Legitimate email with shortened tracking links
+
+**Content Realism:**
+- Use realistic sender names and domains
+- Include actual phishing language patterns
+- Vary sophistication levels (obvious to subtle)
+- Include proper email headers
+- Use realistic timestamps
+
+---
+
+## Non-Functional Requirements
+
+### NFR-1: Performance
+
+**Requirements:**
+- Email list page loads in < 1 second
+- Email detail page loads in < 500ms
+- Phishing analysis completes in < 5 seconds
+- Admin dashboard loads in < 2 seconds
+
+**Rationale:**
+Demo must feel responsive to maintain engagement.
+
+**Testing:**
+- Performance tests in RSpec
+- Manual verification during demo rehearsal
+
+---
+
+### NFR-2: Test Coverage
+
+**Requirements:**
+- Overall test coverage: 100% (SimpleCov)
+- Models: 100% coverage
+- Services: 100% coverage
+- Controllers: 100% coverage
+- All Cucumber scenarios passing
+- All Capybara feature specs passing
+
+**Rationale:**
+Comprehensive testing is the core demonstration value.
+
+**Testing:**
+- SimpleCov HTML report generated on every test run
+- CI pipeline enforces coverage threshold
+- Coverage badge in README
+
+---
+
+### NFR-3: Code Quality
+
+**Requirements:**
+- Zero RuboCop violations
+- All methods < 10 lines (except generated code)
+- All classes < 100 lines
+- Cyclomatic complexity < 6 per method
+- SOLID principles demonstrable
+- Design patterns appropriately applied
+
+**Rationale:**
+Code quality demonstrates professional engineering practices.
+
+**Testing:**
+- RuboCop in CI pipeline
+- Manual code review before demo
+- Flog/Flay analysis for complexity
+
+---
+
+### NFR-4: Security
+
+**Requirements:**
+- Zero critical Brakeman warnings
+- No SQL injection vulnerabilities
+- No XSS vulnerabilities
+- No command injection vulnerabilities
+- Strong parameters in all controllers
+- CSRF protection enabled
+
+**Rationale:**
+Security vulnerabilities would undermine credibility.
+
+**Testing:**
+- Brakeman scan in CI pipeline
+- Manual security review
+- OWASP Top 10 checklist
+
+---
+
+### NFR-5: Documentation
+
+**Requirements:**
+- README with clear setup instructions
+- All public methods documented with YARD
+- Architecture Decision Records for major decisions
+- Testing guide explaining test organization
+- Demo script with talking points
+
+**Rationale:**
+Professional documentation demonstrates attention to detail.
+
+**Deliverables:**
+- `README.md`
+- `docs/testing-guide.md`
+- `docs/demo-script.md`
+- `docs/architecture/adr/*.md`
+- YARD-generated API docs in `docs/api/`
+
+---
+
+### NFR-6: Maintainability
+
+**Requirements:**
+- Clear separation of concerns (MVC + Services)
+- DRY principle applied (no code duplication)
+- Consistent naming conventions
+- Logical folder structure (see folder-structure.mdc)
+- Minimal dependencies (only essential gems)
+
+**Rationale:**
+Clean architecture demonstrates senior-level engineering.
+
+**Metrics:**
+- Flog score < 20 per method
+- Flay score showing minimal duplication
+- Code Climate maintainability rating A
+
+---
+
+### NFR-7: Usability
+
+**Requirements:**
+- Intuitive UI requiring no training
+- Responsive design (desktop and tablet)
+- Accessible (WCAG 2.1 Level AA)
+- Clear error messages
+- Consistent visual design
+
+**Rationale:**
+Professional UI demonstrates full-stack capabilities.
+
+**Testing:**
+- Manual usability testing
+- Accessibility audit with axe DevTools
+- Responsive design testing at multiple breakpoints
+
+---
+
+## User Interface Requirements
+
+### UI-1: Visual Design
+
+**Design Principles:**
+- Clean, professional aesthetic
+- Email security industry conventions
+- Color-coded risk levels (traffic light pattern)
+- Ample whitespace
+- Readable typography (minimum 14px body text)
+
+**Color Palette:**
+- Primary: Professional blue (#2563eb)
+- Success/Low Risk: Green (#10b981)
+- Warning/Medium Risk: Yellow (#f59e0b)
+- Danger/High Risk: Orange (#f97316)
+- Critical Risk: Red (#ef4444)
+- Neutral: Gray scale (#f3f4f6 to #1f2937)
+
+**Typography:**
+- Headings: System UI font stack
+- Body: System UI font stack
+- Monospace (for email headers): SF Mono, Consolas, monospace
+
+---
+
+### UI-2: Navigation
+
+**Primary Navigation:**
+- Inbox (default landing page)
+- Admin Dashboard
+- Logo/title linking to home
+
+**Breadcrumbs:**
+- Email detail: Inbox > [Email Subject]
+- Analysis results: Inbox > [Email Subject] > Analysis
+
+---
+
+### UI-3: Responsive Layouts
+
+**Breakpoints:**
+- Desktop: 1024px+
+- Tablet: 768px - 1023px
+- Mobile: < 768px (out of scope for MVP)
+
+**Responsive Behaviors:**
+- Dashboard widgets stack on tablet
+- Email list remains table-based on tablet
+- Admin charts scale proportionally
+
+---
+
+## Data Requirements
+
+### DR-1: Database Schema
+
+**Core Entities:**
+
+**Emails Table:**
+```
+id: integer (PK)
+sender_email: string (required)
+sender_name: string (required)
+recipient_email: string (required)
+subject: string (required)
+body_html: text
+body_plain: text (required)
+received_at: datetime (required)
+is_phishing: boolean (ground truth for metrics)
+phishing_type: string (enum: credential_harvest, malware, social_engineering, bec, null)
+created_at: datetime
+updated_at: datetime
+```
+
+**Reports Table:**
+```
+id: integer (PK)
+email_id: integer (FK, required)
+reported_at: datetime (required)
+created_at: datetime
+updated_at: datetime
+```
+
+**PhishingIndicators Table:**
+```
+id: integer (PK)
+email_id: integer (FK, required)
+indicator_type: string (enum: url, sender, content, attachment, required)
+severity: string (enum: low, medium, high, critical, required)
+description: text (required)
+details: json (additional metadata)
+created_at: datetime
+updated_at: datetime
+```
+
+**ThreatScores Table:**
+```
+id: integer (PK)
+email_id: integer (FK, required, unique)
+score: integer (0-100, required)
+risk_level: string (enum: low, medium, high, critical, required)
+calculated_at: datetime (required)
+created_at: datetime
+updated_at: datetime
+```
+
+**Indexes:**
+- emails(sender_email)
+- emails(received_at)
+- emails(is_phishing)
+- reports(email_id)
+- phishing_indicators(email_id)
+- phishing_indicators(indicator_type)
+- threat_scores(email_id) - unique
+
+---
+
+### DR-2: Data Validation
+
+**Email Validations:**
+- sender_email: valid email format
+- recipient_email: valid email format
+- subject: present, max 200 characters
+- body_plain: present
+- received_at: present, cannot be future date
+
+**Report Validations:**
+- email_id: must exist
+- One report per email (uniqueness constraint)
+
+**PhishingIndicator Validations:**
+- email_id: must exist
+- indicator_type: must be valid enum value
+- severity: must be valid enum value
+- description: present, max 500 characters
+
+**ThreatScore Validations:**
+- email_id: must exist, unique
+- score: integer, 0-100 range
+- risk_level: must match score range
+
+---
+
+## Integration Requirements
+
+### IR-1: External Dependencies
+
+**Required Gems:**
+- rails (~> 7.1)
+- sqlite3 (development/test)
+- pg (production-ready, optional)
+- rspec-rails (~> 6.0)
+- capybara (~> 3.39)
+- cucumber-rails (~> 2.6)
+- factory_bot_rails (~> 6.2)
+- faker (~> 3.2)
+- simplecov (~> 0.22)
+- rubocop (~> 1.50)
+- brakeman (~> 6.0)
+
+**Optional Gems:**
+- draper (decorators)
+- chartkick (dashboard charts)
+- groupdate (time-series analytics)
+- kaminari (pagination)
+
+---
+
+### IR-2: Future Integration Points
+
+**Designed for Extension (Not Implemented in MVP):**
+- Threat intelligence API (VirusTotal, URLhaus)
+- Email parsing library (mail gem)
+- SIEM integration (webhook support)
+- Authentication (Devise)
+- Background jobs (Sidekiq)
+
+---
+
+## Success Metrics
+
+### Demo Effectiveness Metrics
+
+**Quantitative:**
+- Test coverage: 100%
+- All tests passing: 100%
+- Code quality: 0 RuboCop violations
+- Security: 0 critical Brakeman warnings
+- Performance: All pages < 2s load time
+
+**Qualitative:**
+- Interviewer engagement during demo
+- Technical questions asked (indicates interest)
+- Positive feedback on code organization
+- Recognition of SOLID principles
+- Acknowledgment of domain knowledge
+
+---
+
+## Risks and Mitigation
+
+### Risk 1: Scope Creep
+**Likelihood:** High
+**Impact:** High
+**Mitigation:**
+- Strict adherence to BRD
+- Defer nice-to-haves to backlog
+- Time-box exploratory work
+
+### Risk 2: Test Coverage Gaps
+**Likelihood:** Medium
+**Impact:** Critical
+**Mitigation:**
+- TDD approach from start
+- SimpleCov threshold enforcement
+- Regular coverage audits
+
+### Risk 3: Unrealistic Phishing Examples
+**Likelihood:** Medium
+**Impact:** Medium
+**Mitigation:**
+- Research actual Cofense phishing examples
+- Validate with security professionals
+- Use industry-standard terminology
+
+### Risk 4: Over-Engineering
+**Likelihood:** Medium
+**Impact:** Medium
+**Mitigation:**
+- Follow YAGNI principle
+- Code reviews for simplicity
+- Focus on demo narrative
+
+---
+
+## Approval
+
+This BRD defines the business requirements for PhishingLab MVP. Implementation should proceed to Architecture Requirements Document (ARD) for technical specifications.
+
+**Next Steps:**
+1. Review and validate BRD
+2. Complete ARD with technical architecture
+3. Begin implementation following workflow.mdc
+
+---
+
+## Appendix A: Glossary
+
+| Term | Definition |
+|------|------------|
+| BEC | Business Email Compromise - phishing targeting executives |
+| BDD | Behavior-Driven Development - testing approach using business language |
+| Capybara | Ruby gem for testing web applications by simulating user interaction |
+| Cucumber | BDD testing framework using Gherkin syntax |
+| Homoglyph | Characters that look similar but are different (e.g., 'o' vs '0') |
+| Phishing | Fraudulent emails attempting to steal credentials or deliver malware |
+| RSpec | Ruby testing framework for unit and integration tests |
+| SDET | Software Development Engineer in Test |
+| SimpleCov | Code coverage analysis tool for Ruby |
+| SOLID | Object-oriented design principles (SRP, OCP, LSP, ISP, DIP) |
+| TDD | Test-Driven Development - writing tests before implementation |
+| YARD | Ruby documentation generation tool |
+
+---
+
+## Appendix B: References
+
+- [Cofense Website](https://cofense.com)
+- [Cofense Phishing Examples](https://cofense.com/knowledge-center-hub/real-phishing-email-examples)
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [Ruby Style Guide](https://rubystyle.guide/)
+- [RSpec Best Practices](https://rspec.info/)
+- [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)
