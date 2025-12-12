@@ -1,15 +1,38 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>PhishinglabTemp</title>
+    <title>PhishingLab - Email Security Simulator</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background-color: #f3f4f6;
+      }
+    </style>
   </head>
 
-  <body>
+  <body class="min-h-screen">
+    <!-- Flash Messages -->
+    <% if notice.present? %>
+      <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+        <p><%= notice %></p>
+      </div>
+    <% end %>
+
+    <% if alert.present? %>
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+        <p><%= alert %></p>
+      </div>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>
