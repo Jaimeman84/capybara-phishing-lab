@@ -22,12 +22,13 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby-version }}
-        bundler-cache: true
+        bundler-cache: false
 
     - name: Add Linux platform to bundle
       run: |
         bundle lock --add-platform x86_64-linux
         bundle lock --add-platform ruby
+        bundle install
 
     - name: Install dependencies
       run: |
@@ -78,12 +79,13 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.4.1'
-        bundler-cache: true
+        bundler-cache: false
 
     - name: Add Linux platform to bundle
       run: |
         bundle lock --add-platform x86_64-linux
         bundle lock --add-platform ruby
+        bundle install
 
     - name: Run RuboCop
       run: bundle exec rubocop
@@ -99,12 +101,13 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.4.1'
-        bundler-cache: true
+        bundler-cache: false
 
     - name: Add Linux platform to bundle
       run: |
         bundle lock --add-platform x86_64-linux
         bundle lock --add-platform ruby
+        bundle install
 
     - name: Run Brakeman security scan
       run: bundle exec brakeman --no-pager --quiet
