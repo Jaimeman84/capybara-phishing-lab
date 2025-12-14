@@ -13,7 +13,7 @@ Given('I am viewing an email detail page') do
 end
 
 When('I click on the first email') do
-  first('table tbody tr, .email-item').click
+  first('table tbody tr a').click
 end
 
 When('I click the back or inbox link') do
