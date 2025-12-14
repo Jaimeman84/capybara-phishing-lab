@@ -63,6 +63,9 @@ rerun.txt
 *~
 .DS_Store
 
+# Ignore Claude Code user-specific settings
+.claude/settings.local.json
+
 # Ignore rubocop cache
 .rubocop-*
 

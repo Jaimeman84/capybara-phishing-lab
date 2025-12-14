@@ -73,10 +73,11 @@ end
 group :test do
   # System testing
   gem "capybara", "~> 3.39"
-  gem "selenium-webdriver"
+  gem "selenium-webdriver", "~> 4.27"
 
   # BDD testing
-  gem "cucumber-rails", "~> 2.6", require: false
+  gem "cucumber-rails", "~> 3.1", require: false
+  gem "cucumber", "~> 9.0"
   gem "database_cleaner-active_record"
 
   # Test coverage
@@ -84,8 +85,5 @@ group :test do
 
   # RSpec matchers
   gem "shoulda-matchers", "~> 5.0"
-
-  # Test helpers
-  gem "webdrivers"
 end
 

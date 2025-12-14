@@ -4,9 +4,9 @@
 
 A demonstration platform showcasing enterprise-grade email security testing capabilities, built with Ruby on Rails, RSpec, Capybara, and Cucumber. This project demonstrates professional software engineering practices, comprehensive test coverage, and domain expertise in email security.
 
-[![Ruby Version](https://img.shields.io/badge/ruby-3.2+-red.svg)](https://www.ruby-lang.org/)
+[![Ruby Version](https://img.shields.io/badge/ruby-3.4+-red.svg)](https://www.ruby-lang.org/)
 [![Rails Version](https://img.shields.io/badge/rails-7.1-red.svg)](https://rubyonrails.org/)
-[![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/simplecov-ruby/simplecov)
+[![Test Coverage](https://img.shields.io/badge/coverage-90%25+-brightgreen.svg)](https://github.com/simplecov-ruby/simplecov)
 
 ---
 
@@ -39,7 +39,7 @@ A demonstration platform showcasing enterprise-grade email security testing capa
 
 ### Engineering Excellence
 
-- **100% Test Coverage**: Comprehensive testing with SimpleCov
+- **Comprehensive Test Coverage**: 90%+ coverage with SimpleCov across models, services, and integration tests
 - **SOLID Principles**: Clean architecture demonstrating all five SOLID principles
 - **BDD Approach**: Cucumber scenarios in business-readable Gherkin syntax
 - **Service-Oriented Design**: Business logic encapsulated in testable service objects
@@ -51,15 +51,16 @@ A demonstration platform showcasing enterprise-grade email security testing capa
 ## Tech Stack
 
 ### Core Framework
-- **Ruby** 3.2+
-- **Rails** 7.1
+- **Ruby** 3.4.7
+- **Rails** 7.1.6
 - **SQLite3** (development/test)
 - **Puma** (web server)
 
 ### Testing Frameworks
 - **RSpec** 6.0 - Unit & integration testing
 - **Capybara** 3.39 - Feature testing
-- **Cucumber** 8.0 - BDD scenarios
+- **Cucumber** 9.0 - BDD scenarios
+- **Selenium WebDriver** 4.27 - Browser automation
 - **SimpleCov** 0.22 - Code coverage
 - **FactoryBot** 6.2 - Test data generation
 - **Faker** 3.2 - Realistic fake data
@@ -75,7 +76,7 @@ A demonstration platform showcasing enterprise-grade email security testing capa
 
 ### Prerequisites
 
-- Ruby 3.2 or higher
+- Ruby 3.4 or higher
 - Bundler
 - SQLite3
 
@@ -273,7 +274,7 @@ open doc/index.html
 
 ### Key Talking Points
 
-- **Testing Excellence**: 100% coverage with RSpec, Capybara, Cucumber
+- **Testing Excellence**: Comprehensive 90%+ coverage with RSpec, Capybara, Cucumber
 - **SOLID Principles**: Clean architecture throughout codebase
 - **Domain Knowledge**: Understanding of real-world phishing tactics
 - **Professional Quality**: Production-ready code standards
@@ -330,4 +331,4 @@ Built to demonstrate SDET skills including:
 
 ---
 
-**Status**: Active Development | **Coverage**: 100% | **Tests**: All Passing
+**Status**: Active Development | **Coverage**: 90%+ | **Tests**: All Passing

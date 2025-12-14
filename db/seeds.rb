@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 puts "Clearing existing data..."
-[Email, Report, PhishingIndicator, ThreatScore].each(&:delete_all)
+ThreatScore.delete_all
+PhishingIndicator.delete_all
+Report.delete_all
+Email.delete_all
 
 puts "Creating demo emails..."
 

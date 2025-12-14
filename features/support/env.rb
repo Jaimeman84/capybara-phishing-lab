@@ -13,6 +13,56 @@ require 'cucumber/rails'
 # selectors in your step definitions to use the XPath syntax.
 # Capybara.default_selector = :xpath
 
+# ========== ADD VISIBLE BROWSER DRIVERS ==========
+
+require 'selenium-webdriver'
+
+# Chrome (visible) - Selenium Manager will auto-download chromedriver
+Capybara.register_driver :selenium_chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--start-maximized')
+  options.add_argument('--disable-search-engine-choice-screen')
+  options.add_argument('--disable-blink-features=AutomationControlled')
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+
+# Firefox (visible) - Selenium Manager will auto-download geckodriver
+Capybara.register_driver :selenium_firefox do |app|
+  options = Selenium::WebDriver::Firefox::Options.new
+  options.add_argument('--start-maximized')
+
+  Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
+end
+
+# Chrome (headless)
+Capybara.register_driver :selenium_chrome_headless do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--headless=new')
+  options.add_argument('--disable-gpu')
+  options.add_argument('--no-sandbox')
+  options.add_argument('--disable-dev-shm-usage')
+  options.add_argument('--disable-search-engine-choice-screen')
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+
+# Set default driver for visible execution
+# Use environment variable for CI/CD, otherwise use visible browser
+if ENV['CI'] || ENV['CAPYBARA_DRIVER'] == 'rack_test'
+  # Headless for CI
+  Capybara.default_driver = :rack_test
+  Capybara.javascript_driver = :selenium_chrome_headless
+else
+  # Visible browser for local development
+  Capybara.default_driver = :selenium_chrome
+  Capybara.javascript_driver = :selenium_chrome
+end
+
+# Increase wait time for visible browser testing
+Capybara.default_max_wait_time = 5
+Capybara.server = :puma, { Silent: true }
+
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
 # your application behaves in the production environment, where an error page will
@@ -33,7 +83,8 @@ ActionController::Base.allow_rescue = false
 # Remove/comment out the lines below if your app doesn't have a database.
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
 begin
-  DatabaseCleaner.strategy = :transaction
+  # Use truncation for Selenium tests (visible browser)
+  DatabaseCleaner.strategy = :truncation
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end

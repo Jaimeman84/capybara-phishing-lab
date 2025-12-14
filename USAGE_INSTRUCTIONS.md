@@ -1,32 +1,46 @@
-# PhishingLab - Usage & Testing Instructions
+# PhishingLab - Complete Usage Guide
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start (3 Minutes)
+
+### Get Running Fast
+
+```bash
+# Ensure you have Ruby 3.2+ installed
+ruby --version
+
+# Start the application (database is already set up!)
+rails server
+```
+
+**That's it!** The database comes pre-loaded with 10 demo emails.
+
+**Access the Application:**
+- **Main Inbox:** http://localhost:3000
+- **Admin Dashboard:** http://localhost:3000/admin/dashboard
+
+---
+
+## 📋 Detailed Setup (First Time Users)
+
+If you need to set up from scratch or reset the database:
 
 ### Prerequisites
 - Ruby 3.2+ installed
 - Bundler installed
 - SQLite3 installed
 
-### Step 1: Install Dependencies
+### Installation Steps
+
 ```bash
-cd capybara-phishlab
+# 1. Install dependencies
 bundle install
-```
 
-### Step 2: Set Up Database
-```bash
-# Create database
+# 2. Set up database
 rails db:create
-
-# Run migrations
 rails db:migrate
-
-# Load demo data (10 realistic emails: 7 phishing, 3 legitimate)
 rails db:seed
-```
 
-### Step 3: Start the Application
-```bash
+# 3. Start the application
 rails server
 ```
 
@@ -39,38 +53,43 @@ The application will be available at: **http://localhost:3000**
 ### Main Features
 
 #### 1. **Email Inbox** (http://localhost:3000)
-- View all emails in a realistic corporate inbox
-- See sender information, subject, and received date
-- Identify which emails have been reported
-- View risk levels for analyzed emails (Low/Medium/High/Critical)
+View all emails in a realistic corporate inbox with:
+- Sender information (name + email)
+- Subject lines
+- Received dates
+- Status badges (Reported/Unread)
+- Risk level badges (Low/Medium/High/Critical) for analyzed emails
 
 **How to use:**
-- Browse the inbox
+- Browse the inbox (10 emails: 7 phishing, 3 legitimate)
 - Click on any email to view full details
-- Look for suspicious characteristics (covered in demo scenarios below)
+- Look for suspicious characteristics
 
 #### 2. **Email Detail View**
-- Read full email content
-- See sender details and timestamp
-- Report suspicious emails for analysis
-- View phishing detection results after reporting
+Detailed view of individual emails showing:
+- Full email content
+- Sender details and timestamp
+- "Report as Phishing" button (if not yet reported)
+- Complete analysis results (after reporting)
 
 **How to use:**
 1. Click on an email from the inbox
 2. Read the email content carefully
-3. Click "Report as Phishing" button (red button)
-4. Wait for automatic analysis (happens immediately)
-5. Review the analysis results showing:
-   - Threat Score (0-100)
-   - Risk Level (Low/Medium/High/Critical)
-   - Detected Indicators grouped by type
-   - Severity ratings for each indicator
+3. Click the **red "Report as Phishing"** button
+4. Wait 1-2 seconds for automatic analysis
+5. Review the results:
+   - **Threat Score** (0-100)
+   - **Risk Level** (Low/Medium/High/Critical)
+   - **Detected Indicators** grouped by type
+   - **Severity ratings** for each indicator
 
 #### 3. **Admin Dashboard** (http://localhost:3000/admin/dashboard)
-- View total email statistics
-- See risk distribution across reported emails
-- Review most common phishing indicators
-- Track detection effectiveness
+Analytics and metrics dashboard featuring:
+- Total email statistics
+- Reported email counts
+- Risk distribution chart with color-coded bars
+- Top 10 most common phishing indicators
+- Detection effectiveness metrics
 
 **How to access:**
 - Click "Admin Dashboard" button in top-right of inbox
@@ -78,53 +97,69 @@ The application will be available at: **http://localhost:3000**
 
 ---
 
-## 🎭 Demo Scenarios
+## 🎯 Demo Scenarios (2-Minute Walkthrough)
 
-### Scenario 1: Detecting Credential Harvesting
+### Scenario 1: Detecting Credential Harvesting (High-Risk Phishing)
 
-1. Go to http://localhost:3000
-2. Find the email with subject: **"URGENT: Your account will be suspended"**
-   - From: Microsoft Security
-   - Notice the urgency language in the subject
-3. Click to open the email
-4. Observe suspicious elements:
+**Email:** "URGENT: Your account will be suspended"
+**From:** Microsoft Security (security@micros0ft.com)
+
+**Steps:**
+1. Find and click this email in the inbox
+2. Observe suspicious elements:
    - Generic greeting ("Dear customer")
    - Urgent/threatening language
    - Shortened URL (bit.ly)
-   - Sender domain mismatch (micros0ft.com)
-5. Click **"Report as Phishing"**
-6. Review the analysis showing:
-   - **High** threat score (likely 60-80)
-   - URL indicators (shortened URL)
+   - **Sender domain spoofing** (micros0ft.com with '0' instead of 'o')
+3. Click **"Report as Phishing"**
+4. Review the analysis showing:
+   - **High/Critical** threat score (likely 70-90)
+   - URL indicators (shortened URL detected)
    - Content indicators (urgency language, credential request)
-   - Sender indicators (free email or suspicious domain)
+   - Sender indicators (domain spoofing, brand mismatch)
 
-**Expected Outcome:** Critical/High risk rating with multiple indicators detected
+**Expected Outcome:** Critical/High risk rating (70-90 score) with multiple indicators
+
+**Key Indicators Detected:**
+- ✓ Urgency language
+- ✓ URL shortener
+- ✓ Credential request
+- ✓ Domain spoofing (micros0ft.com)
 
 ---
 
 ### Scenario 2: Malware Delivery Detection
 
-1. Find email: **"Invoice #45832 - Action Required"**
-   - From: Accounts Payable (supplier-company.xyz)
-2. Click to view
-3. Notice:
+**Email:** "Invoice #45832 - Action Required"
+**From:** Accounts Payable (supplier-company.xyz)
+
+**Steps:**
+1. Find and click this email
+2. Notice suspicious elements:
    - Suspicious TLD (.xyz)
    - IP address in URL (192.168.1.100)
    - Executable file mention (.exe)
-4. Report the email
-5. See indicators for:
+3. Click "Report as Phishing"
+4. See indicators for:
    - Suspicious URL (IP-based, suspicious TLD)
    - Attachment-related content (executable)
 
-**Expected Outcome:** High/Critical risk with URL and attachment indicators
+**Expected Outcome:** High/Critical risk (70-90 score) with URL and attachment indicators
+
+**Key Indicators Detected:**
+- ✓ Suspicious .xyz domain
+- ✓ IP address in URL
+- ✓ Executable file mentioned
 
 ---
 
 ### Scenario 3: CEO Fraud (BEC) Detection
 
-1. Find email: **"Urgent wire transfer needed"**
-   - From: CEO Office (ceo@gmail.com)
+**Email:** "Urgent wire transfer needed"
+**From:** CEO Office (ceo@gmail.com)
+
+**Steps:**
+1. Find and click this email
 2. Observe:
    - CEO sending from free email (Gmail)
    - Unusual urgency
@@ -135,14 +170,22 @@ The application will be available at: **http://localhost:3000**
    - Urgency language
    - Generic sender name
 
-**Expected Outcome:** Medium/High risk highlighting free email provider
+**Expected Outcome:** Medium/High risk (40-60 score) highlighting free email provider
+
+**Key Indicators Detected:**
+- ✓ CEO using Gmail
+- ✓ Urgent financial request
+- ✓ Generic sender
 
 ---
 
-### Scenario 4: Legitimate Email
+### Scenario 4: Legitimate Email (Low Risk)
 
-1. Find email: **"Q4 Project Update"**
-   - From: john.smith@company.com
+**Email:** "Q4 Project Update"
+**From:** john.smith@company.com
+
+**Steps:**
+1. Find and click this email
 2. Notice professional characteristics:
    - Corporate email domain
    - Normal subject line
@@ -154,7 +197,83 @@ The application will be available at: **http://localhost:3000**
    - Few or no indicators
    - System correctly identifies as likely legitimate
 
-**Expected Outcome:** Low risk score, minimal indicators
+**Expected Outcome:** Low risk score (0-20), minimal indicators
+
+**Key Characteristics:**
+- ✓ Corporate domain
+- ✓ No urgency
+- ✓ Normal content
+
+---
+
+## 🔍 Understanding the Detection Engine
+
+### Phishing Indicators
+
+The system detects 4 types of indicators:
+
+#### 1. URL Indicators
+- Suspicious TLDs (.tk, .ml, .ga, .xyz, etc.)
+- URL shorteners (bit.ly, tinyurl.com, etc.)
+- IP-based URLs
+- Mismatched domains
+
+#### 2. Sender Indicators
+- Free email providers (gmail.com, yahoo.com, etc.)
+- Generic sender names (admin, support, no-reply)
+- Suspicious domain TLDs (.tk, .ml, .xyz, etc.)
+- IP-based sender addresses
+- Domain spoofing/typosquatting (micros0ft.com instead of microsoft.com)
+- Brand name mismatch (claims to be from Microsoft but uses different domain)
+- Excessive numbers in domain name
+
+#### 3. Content Indicators
+- Urgency language ("urgent", "immediate", "expire")
+- Credential requests ("password", "verify account")
+- Generic greetings ("Dear customer")
+
+#### 4. Attachment Indicators
+- Executable files (.exe, .scr, .bat)
+- Suspicious attachments (.zip, .rar)
+- Password-protected archives
+
+### Threat Scoring System
+
+Scores are calculated by adding weights for detected indicators:
+
+- **Low severity:** +5 points
+- **Medium severity:** +10-15 points
+- **High severity:** +15-25 points
+- **Critical severity:** +25-30 points
+
+**Risk Levels:**
+- **0-25:** Low Risk (likely legitimate)
+- **26-50:** Medium Risk (suspicious, investigate)
+- **51-75:** High Risk (likely phishing)
+- **76-100:** Critical Risk (definite phishing)
+
+---
+
+## 📊 Admin Dashboard Features
+
+### Statistics Cards
+- **Total Emails:** All emails in the system
+- **Reported Emails:** Emails that have been analyzed
+- **Confirmed Phishing:** Emails classified as phishing
+
+### Risk Distribution Chart
+- Visual breakdown of emails by risk level
+- Percentage and count for each level
+- Color-coded bars:
+  - 🟢 Green (Low)
+  - 🟡 Yellow (Medium)
+  - 🟠 Orange (High)
+  - 🔴 Red (Critical)
+
+### Top 10 Indicators
+- Most frequently detected indicators
+- Helps identify common phishing patterns
+- Useful for security awareness training
 
 ---
 
@@ -166,7 +285,7 @@ The application will be available at: **http://localhost:3000**
 # RSpec unit and integration tests
 bundle exec rspec
 
-# Cucumber BDD scenarios (if implemented)
+# Cucumber BDD scenarios
 bundle exec cucumber
 
 # Run both
@@ -198,70 +317,20 @@ bundle exec brakeman
 
 ---
 
-## 🔍 Understanding the Detection Engine
+## 🔧 Troubleshooting
 
-### Phishing Indicators
+### Port 3000 already in use?
+```bash
+# Use a different port
+rails server -p 3001
+# Then visit: http://localhost:3001
+```
 
-The system detects 4 types of indicators:
-
-#### 1. URL Indicators
-- Suspicious TLDs (.tk, .ml, .ga, .xyz, etc.)
-- URL shorteners (bit.ly, tinyurl.com, etc.)
-- IP-based URLs
-- Mismatched domains
-
-#### 2. Sender Indicators
-- Free email providers (gmail.com, yahoo.com, etc.)
-- Generic sender names (admin, support, no-reply)
-- Suspicious sender patterns
-
-#### 3. Content Indicators
-- Urgency language ("urgent", "immediate", "expire")
-- Credential requests ("password", "verify account")
-- Generic greetings ("Dear customer")
-
-#### 4. Attachment Indicators
-- Executable files (.exe, .scr, .bat)
-- Suspicious attachments (.zip, .rar)
-- Password-protected archives
-
-### Threat Scoring
-
-Scores are calculated by adding weights for detected indicators:
-
-- **Low severity:** +5 points
-- **Medium severity:** +10-15 points
-- **High severity:** +15-25 points
-- **Critical severity:** +25-30 points
-
-**Risk Levels:**
-- **0-25:** Low Risk (likely legitimate)
-- **26-50:** Medium Risk (suspicious, investigate)
-- **51-75:** High Risk (likely phishing)
-- **76-100:** Critical Risk (definite phishing)
-
----
-
-## 📊 Admin Dashboard Features
-
-### Statistics
-- Total emails in system
-- Total reported emails
-- Confirmed phishing emails
-
-### Risk Distribution
-- Visual breakdown of emails by risk level
-- Percentage and count for each level
-- Color-coded bars (Green/Yellow/Orange/Red)
-
-### Top Indicators
-- Most frequently detected indicators
-- Helps identify common phishing patterns
-- Useful for security awareness training
-
----
-
-## 🛠️ Troubleshooting
+### Want to reset the demo data?
+```bash
+rails db:seed
+# This clears and reloads the 10 demo emails
+```
 
 ### No emails showing?
 ```bash
@@ -270,11 +339,10 @@ rails db:seed
 
 ### Application won't start?
 ```bash
-# Check if port 3000 is in use
-netstat -an | findstr 3000
-
-# Start on different port
-rails s -p 3001
+# Ensure database exists
+rails db:create
+rails db:migrate
+rails db:seed
 ```
 
 ### Database errors?
@@ -294,29 +362,37 @@ bundle exec rspec spec/models/email_spec.rb
 
 ---
 
-## 🎯 Demo Talking Points
+## 🎭 Demo Talking Points
 
 When presenting this project:
 
-1. **Architecture:**
-   - "I implemented SOLID principles throughout - each analyzer has a single responsibility"
-   - "Used service objects to keep controllers thin and logic testable"
-   - "Follows Rails conventions with custom enhancements for enterprise patterns"
+### 1. Architecture
+- "I implemented SOLID principles throughout - each analyzer has a single responsibility"
+- "Used service objects to keep controllers thin and logic testable"
+- "Follows Rails conventions with custom enhancements for enterprise patterns"
 
-2. **Testing:**
-   - "Achieved 100% test coverage using RSpec, Capybara, and Cucumber"
-   - "Wrote BDD scenarios that non-technical stakeholders can read"
-   - "Used FactoryBot for maintainable test data"
+### 2. Testing
+- "Achieved comprehensive test coverage using RSpec, Capybara, and Cucumber"
+- "Wrote BDD scenarios that non-technical stakeholders can read"
+- "Used FactoryBot for maintainable test data"
 
-3. **Domain Knowledge:**
-   - "Researched actual phishing tactics from Cofense's knowledge base"
-   - "Implemented realistic detection algorithms based on industry standards"
-   - "Created weighted scoring system similar to enterprise threat platforms"
+### 3. Domain Knowledge
+- "Researched actual phishing tactics from industry knowledge bases"
+- "Implemented realistic detection algorithms based on industry standards"
+- "Created weighted scoring system similar to enterprise threat platforms"
 
-4. **Code Quality:**
-   - "Zero RuboCop violations"
-   - "Security scanned with Brakeman - no vulnerabilities"
-   - "Comprehensive documentation and ADRs for architectural decisions"
+### 4. Code Quality
+- "Zero RuboCop violations"
+- "Security scanned with Brakeman - no vulnerabilities"
+- "Comprehensive documentation and ADRs for architectural decisions"
+
+### 5. Technical Stack Highlights
+- Ruby on Rails 7.1
+- SQLite database
+- Tailwind CSS (via CDN)
+- Professional MVC architecture
+- Service object pattern
+- Repository pattern (planned)
 
 ---
 
@@ -351,9 +427,21 @@ When presenting this project:
 
 ---
 
+## 💡 Key Features to Highlight
+
+### For SDET Interview:
+- ✅ **SOLID Principles** - See `app/services/phishing_detection/` for SRP/OCP examples
+- ✅ **Clean Architecture** - Controllers → Services → Models separation
+- ✅ **Test Framework** - RSpec, Capybara, Cucumber configured
+- ✅ **Security** - CSRF, XSS protection, input validation
+- ✅ **Documentation** - Comprehensive guides and planning docs
+
+---
+
 ## 📚 Additional Resources
 
 - [README.md](README.md) - Project overview and setup
+- [QUICKSTART.md](QUICKSTART.md) - Ultra-quick reference
 - [workflow.mdc](workflow.mdc) - Development workflow
 - [brd.mdc](brd.mdc) - Business requirements
 - [ard.mdc](ard.mdc) - Architecture details
@@ -365,13 +453,30 @@ When presenting this project:
 
 After mastering the basic demo:
 
-1. Report all 7 phishing emails
-2. Compare their threat scores
-3. Review the admin dashboard analytics
-4. Try reporting a legitimate email (low score expected)
-5. Explore the codebase in `app/services/phishing_detection/`
-6. Run the test suite: `bundle exec rspec`
-7. Check code coverage: `open coverage/index.html`
+1. **Try All Demos** - Report all 7 phishing emails
+2. **Compare Scores** - See how different tactics rate
+3. **View Dashboard** - Review analytics after reporting multiple emails
+4. **Test False Positives** - Try reporting legitimate emails (low score expected)
+5. **Explore Code** - Check out `app/services/phishing_detection/`
+6. **Run Tests** - Execute `bundle exec rspec` and `bundle exec cucumber`
+7. **Check Coverage** - Open `coverage/index.html`
+8. **Read Architecture** - See [ard.mdc](ard.mdc) for design details
+
+---
+
+## 📍 Database Location
+
+The SQLite database files are located in the `storage` directory:
+
+- **Development database:** `storage/development.sqlite3`
+- **Test database:** `storage/test.sqlite3`
+- **Production database:** `storage/production.sqlite3`
+
+You can access these databases using:
+- **DB Browser for SQLite** (GUI tool)
+- **sqlite3 CLI:** `sqlite3 storage/development.sqlite3`
+- **Rails console:** `rails console`
+- **Rails dbconsole:** `rails dbconsole`
 
 ---
 

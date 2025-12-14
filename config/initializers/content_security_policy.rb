@@ -7,18 +7,19 @@
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self, :https
-    policy.font_src    :self, :https, :data
+    policy.font_src    :self, :https, :data, 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'
     policy.img_src     :self, :https, :data
     policy.object_src  :none
     policy.script_src  :self, :https, :unsafe_inline, 'https://cdn.tailwindcss.com'
-    policy.style_src   :self, :https, :unsafe_inline
+    policy.style_src   :self, :https, :unsafe_inline, 'https://cdn.tailwindcss.com', 'https://fonts.googleapis.com'
+    policy.connect_src :self, :https
     # Specify URI for violation reports
     # policy.report_uri "/csp-violation-report-endpoint"
   end
 
-  # Generate session nonces for permitted importmap, inline scripts, and inline styles.
-  config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
-  config.content_security_policy_nonce_directives = %w(script-src style-src)
+  # Disable nonces since we're using unsafe-inline
+  config.content_security_policy_nonce_generator = nil
+  config.content_security_policy_nonce_directives = []
 
   # Report violations without enforcing the policy.
   # config.content_security_policy_report_only = true

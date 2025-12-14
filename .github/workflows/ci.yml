@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ruby-version: ['3.4']
+
+    services:
+      db:
+        image: sqlite3
+        options: >-
+          --health-cmd "echo 'SELECT 1' | sqlite3 /tmp/test.db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y sqlite3 libsqlite3-dev
+
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@latest
+      with:
+        chrome-version: stable
+
+    - name: Setup database
+      env:
+        RAILS_ENV: test
+      run: |
+        bundle exec rails db:create
+        bundle exec rails db:migrate
+
+    - name: Run RSpec tests
+      env:
+        RAILS_ENV: test
+        CI: true
+      run: bundle exec rspec
+
+    - name: Run Cucumber tests
+      env:
+        RAILS_ENV: test
+        CI: true
+        CAPYBARA_DRIVER: rack_test
+      run: bundle exec cucumber
+
+    - name: Upload coverage reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage/
+        retention-days: 7
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4'
+        bundler-cache: true
+
+    - name: Run RuboCop
+      run: bundle exec rubocop
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.4'
+        bundler-cache: true
+
+    - name: Run Brakeman security scan
+      run: bundle exec brakeman --no-pager
+
+    - name: Upload Brakeman report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: brakeman-report
+        path: brakeman.html
+        retention-days: 7

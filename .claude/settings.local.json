@@ -16,7 +16,15 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(rails db:seed:*)",
-      "Bash(rails routes:*)"
+      "Bash(rails routes:*)",
+      "Bash(rails db:migrate:status:*)",
+      "Bash(rails runner:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(bundle update:*)",
+      "Bash(bundle exec cucumber:*)",
+      "Bash(bundle remove:*)",
+      "Bash(tree:*)"
     ]
   }
 }
