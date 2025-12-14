@@ -12,16 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        ruby-version: ['3.4']
-
-    services:
-      db:
-        image: sqlite3
-        options: >-
-          --health-cmd "echo 'SELECT 1' | sqlite3 /tmp/test.db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        ruby-version: ['3.4.1']
 
     steps:
     - name: Checkout code
@@ -38,7 +29,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y sqlite3 libsqlite3-dev
 
-    - name: Install Chrome
+    - name: Install Chrome for Selenium
       uses: browser-actions/setup-chrome@latest
       with:
         chrome-version: stable
@@ -53,7 +44,6 @@ jobs:
     - name: Run RSpec tests
       env:
         RAILS_ENV: test
-        CI: true
       run: bundle exec rspec
 
     - name: Run Cucumber tests
@@ -70,6 +60,7 @@ jobs:
         name: coverage-report
         path: coverage/
         retention-days: 7
+        if-no-files-found: ignore
 
   lint:
     runs-on: ubuntu-latest
@@ -81,7 +72,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.4'
+        ruby-version: '3.4.1'
         bundler-cache: true
 
     - name: Run RuboCop
@@ -97,16 +88,17 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.4'
+        ruby-version: '3.4.1'
         bundler-cache: true
 
     - name: Run Brakeman security scan
-      run: bundle exec brakeman --no-pager
+      run: bundle exec brakeman --no-pager --quiet
 
-    - name: Upload Brakeman report
+    - name: Upload Brakeman report (if exists)
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: brakeman-report
         path: brakeman.html
         retention-days: 7
+        if-no-files-found: ignore

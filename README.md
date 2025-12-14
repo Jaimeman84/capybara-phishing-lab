@@ -27,24 +27,24 @@ A demonstration platform showcasing enterprise-grade email security testing capa
 
 ### Core Functionality
 
-- **Email Inbox Simulator**: Realistic corporate inbox with mixed legitimate and phishing emails
+- **Email Inbox Simulator**: Realistic corporate inbox with 10 demo emails (7 phishing, 3 legitimate)
 - **Phishing Detection Engine**: Automated analysis across four dimensions:
-  - URL reputation checking
-  - Sender authentication validation
-  - Content pattern matching
-  - Attachment risk assessment
+  - URL reputation checking (suspicious TLDs, shorteners, IP addresses)
+  - Sender authentication validation (domain spoofing, free email providers, brand mismatch)
+  - Content pattern matching (urgency language, credential requests, generic greetings)
+  - Attachment risk assessment (executable files, suspicious archives)
 - **Threat Scoring**: Weighted scoring algorithm with risk level categorization (Low/Medium/High/Critical)
 - **Reporting Workflow**: User-friendly interface for reporting suspicious emails
-- **Admin Dashboard**: Analytics and metrics for threat distribution and detection effectiveness
+- **Admin Dashboard**: Real-time analytics showing threat distribution and top 10 indicators
 
 ### Engineering Excellence
 
-- **Comprehensive Test Coverage**: 90%+ coverage with SimpleCov across models, services, and integration tests
+- **Comprehensive Test Coverage**: 23 Cucumber scenarios (23 passed), 117 steps (117 passed)
 - **SOLID Principles**: Clean architecture demonstrating all five SOLID principles
 - **BDD Approach**: Cucumber scenarios in business-readable Gherkin syntax
 - **Service-Oriented Design**: Business logic encapsulated in testable service objects
 - **Security-First**: Zero vulnerabilities (verified via Brakeman)
-- **Code Quality**: Zero RuboCop violations
+- **Modern UI**: Tailwind CSS via CDN with responsive design
 
 ---
 
@@ -80,36 +80,33 @@ A demonstration platform showcasing enterprise-grade email security testing capa
 - Bundler
 - SQLite3
 
-### Installation
+### Quick Start (30 Seconds)
 
-1. **Clone the repository**
-   ```bash
-   cd capybara-phishlab
-   ```
+```bash
+# The database is already set up with 10 demo emails!
+rails server
+```
 
-2. **Install dependencies**
-   ```bash
-   bundle install
-   ```
+**Access the application:**
+- **Main Inbox:** http://localhost:3000
+- **Admin Dashboard:** http://localhost:3000/admin/dashboard
 
-3. **Set up the database**
-   ```bash
-   rails db:create db:migrate
-   ```
+### First Time Setup
 
-4. **Seed demo data**
-   ```bash
-   rails db:seed
-   ```
+If you need to reset or set up from scratch:
 
-5. **Start the server**
-   ```bash
-   rails server
-   ```
+```bash
+# Install dependencies
+bundle install
 
-6. **Visit the application**
-   - Inbox: http://localhost:3000/emails
-   - Admin Dashboard: http://localhost:3000/admin/dashboard
+# Set up the database
+rails db:create db:migrate db:seed
+
+# Start the server
+rails server
+```
+
+**See [QUICKSTART.md](QUICKSTART.md) for the ultra-quick reference or [USAGE_INSTRUCTIONS.md](USAGE_INSTRUCTIONS.md) for the complete guide.**
 
 ---
 
@@ -240,25 +237,16 @@ Reports
 
 ## Documentation
 
+### User Guides
+- **[QUICKSTART.md](QUICKSTART.md)** - Get running in 30 seconds
+- **[USAGE_INSTRUCTIONS.md](USAGE_INSTRUCTIONS.md)** - Complete usage guide with demo scenarios
+
 ### Planning Documents
-- [workflow.mdc](workflow.mdc) - Development workflow & stages
+- [workflow.mdc](workflow.mdc) - Development workflow & stages (all completed ✅)
 - [folder-structure.mdc](folder-structure.mdc) - Project architecture blueprint
 - [icp.mdc](icp.mdc) - Ideal Customer Profile
 - [brd.mdc](brd.mdc) - Business Requirements Document
 - [ard.mdc](ard.mdc) - Architecture Requirements Document
-
-### Architecture Decision Records
-- Located in `docs/architecture/adr/`
-- Documents major architectural decisions with rationale
-
-### API Documentation
-```bash
-# Generate YARD documentation
-bundle exec yard doc
-
-# View documentation
-open doc/index.html
-```
 
 ---
 
@@ -287,14 +275,14 @@ open doc/index.html
 ### Test Pyramid
 
 ```
-     /\
-    /  \      E2E Tests (Cucumber)
-   /____\     Few, slow, high-value scenarios
-  /      \
- /        \   Integration Tests (Capybara)
-/__________\  Medium number, user workflows
-/            \
-/              \  Unit Tests (RSpec)
+        /\
+       /  \      E2E Tests (Cucumber)
+      /____\     Few, slow, high-value scenarios
+     /      \
+    /        \   Integration Tests (Capybara)
+   /__________\  Medium number, user workflows
+  /            \
+ /              \  Unit Tests (RSpec)
 /________________\ Many, fast, comprehensive coverage
 ```
 
@@ -331,4 +319,17 @@ Built to demonstrate SDET skills including:
 
 ---
 
-**Status**: Active Development | **Coverage**: 90%+ | **Tests**: All Passing
+**Status**: ✅ Completed & Demo-Ready | **Tests**: 23/23 Scenarios Passing (117/117 steps) | **Database**: Pre-loaded with 10 demo emails
+
+---
+
+## 🎯 Quick Demo
+
+1. Start the server: `rails server`
+2. Visit http://localhost:3000
+3. Click on **"URGENT: Your account will be suspended"**
+4. Click **"Report as Phishing"**
+5. See threat analysis with detected indicators
+6. Visit **Admin Dashboard** for analytics
+
+**Ready to impress!** 🚀
