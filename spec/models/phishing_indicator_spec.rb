@@ -4,14 +4,14 @@ require 'rails_helper'
 
 RSpec.describe PhishingIndicator, type: :model do
   describe 'associations' do
-    it { should belong_to(:email) }
+    it { is_expected.to belong_to(:email) }
   end
 
   describe 'validations' do
-    it { should validate_presence_of(:indicator_type) }
-    it { should validate_presence_of(:severity) }
-    it { should validate_presence_of(:description) }
-    it { should validate_length_of(:description).is_at_most(500) }
+    it { is_expected.to validate_presence_of(:indicator_type) }
+    it { is_expected.to validate_presence_of(:severity) }
+    it { is_expected.to validate_presence_of(:description) }
+    it { is_expected.to validate_length_of(:description).is_at_most(500) }
 
     it 'validates indicator_type inclusion' do
       email = create(:email)
@@ -55,21 +55,21 @@ RSpec.describe PhishingIndicator, type: :model do
 
     describe '.by_type' do
       it 'filters indicators by type' do
-        expect(PhishingIndicator.by_type('url')).to include(url_indicator)
-        expect(PhishingIndicator.by_type('url')).not_to include(sender_indicator)
+        expect(described_class.by_type('url')).to include(url_indicator)
+        expect(described_class.by_type('url')).not_to include(sender_indicator)
       end
     end
 
     describe '.by_severity' do
       it 'filters indicators by severity' do
-        expect(PhishingIndicator.by_severity('low')).to include(low_indicator)
-        expect(PhishingIndicator.by_severity('low')).not_to include(high_indicator)
+        expect(described_class.by_severity('low')).to include(low_indicator)
+        expect(described_class.by_severity('low')).not_to include(high_indicator)
       end
     end
 
     describe '.high_severity' do
       it 'returns only high and critical indicators' do
-        high_severity = PhishingIndicator.high_severity
+        high_severity = described_class.high_severity
         expect(high_severity).to include(high_indicator, critical_indicator)
         expect(high_severity).not_to include(low_indicator, medium_indicator)
       end

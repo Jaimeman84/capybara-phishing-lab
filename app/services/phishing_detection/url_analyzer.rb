@@ -21,7 +21,7 @@ module PhishingDetection
     end
 
     def extract_urls
-      uri_regex = URI.regexp(%w[http https])
+      uri_regex = URI::DEFAULT_PARSER.make_regexp(%w[http https])
       [@email.body_plain, @email.body_html].compact.flat_map do |text|
         text.scan(uri_regex).flatten.compact
       end.uniq

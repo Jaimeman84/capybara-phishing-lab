@@ -125,8 +125,8 @@ end
 Then('I should see detected phishing indicators') do
   # Look for any indication that indicators are shown
   has_indicators = page.has_content?(/indicator|detected|found/i) ||
-    page.has_css?('[class*="indicator"]', minimum: 1) ||
-    page.has_css?('li, .list-item, table tr', minimum: 1)
+                   page.has_css?('[class*="indicator"]', minimum: 1) ||
+                   page.has_css?('li, .list-item, table tr', minimum: 1)
 
   expect(has_indicators).to be true
 end

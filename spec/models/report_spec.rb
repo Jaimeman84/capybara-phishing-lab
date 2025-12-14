@@ -4,21 +4,21 @@ require 'rails_helper'
 
 RSpec.describe Report, type: :model do
   describe 'associations' do
-    it { should belong_to(:email) }
+    it { is_expected.to belong_to(:email) }
   end
 
   describe 'validations' do
     subject { create(:report) }
 
-    it { should validate_uniqueness_of(:email_id) }
-    it { should validate_presence_of(:reported_at) }
+    it { is_expected.to validate_uniqueness_of(:email_id) }
+    it { is_expected.to validate_presence_of(:reported_at) }
   end
 
   describe 'callbacks' do
     describe '#set_reported_at' do
       it 'sets reported_at on create when nil' do
         email = create(:email)
-        report = Report.new(email: email)
+        report = described_class.new(email: email)
         expect(report.reported_at).to be_nil
         report.save!
         expect(report.reported_at).to be_present
@@ -28,7 +28,7 @@ RSpec.describe Report, type: :model do
       it 'does not override reported_at if already set' do
         email = create(:email)
         custom_time = 2.days.ago
-        report = Report.create!(email: email, reported_at: custom_time)
+        report = described_class.create!(email: email, reported_at: custom_time)
         expect(report.reported_at).to be_within(1.second).of(custom_time)
       end
     end

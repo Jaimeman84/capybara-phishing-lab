@@ -18,7 +18,7 @@ RSpec.describe PhishingDetectionService do
     end
 
     it 'creates a threat score for the email' do
-      expect { service.analyze }.to change { email.threat_score }.from(nil)
+      expect { service.analyze }.to change(email, :threat_score).from(nil)
     end
 
     it 'runs all analyzers' do
@@ -65,7 +65,7 @@ RSpec.describe PhishingDetectionService do
                               subject: 'URGENT: Verify your password',
                               body_plain: 'Click here: http://bit.ly/fake')
 
-      result = PhishingDetectionService.new(phishing_email).analyze
+      result = described_class.new(phishing_email).analyze
 
       expect(result[:indicators]).not_to be_empty
       expect(result[:threat_score]).to be > 30
@@ -77,7 +77,7 @@ RSpec.describe PhishingDetectionService do
                                 subject: 'Meeting notes',
                                 body_plain: 'Here are the notes from our meeting.')
 
-      result = PhishingDetectionService.new(legitimate_email).analyze
+      result = described_class.new(legitimate_email).analyze
 
       expect(result[:threat_score]).to be < 50
     end

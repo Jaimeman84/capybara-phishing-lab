@@ -2,8 +2,10 @@
 
 module PhishingDetection
   class SenderAnalyzer < BaseAnalyzer
-    FREE_EMAIL_PROVIDERS = %w[gmail.com yahoo.com hotmail.com outlook.com aol.com mail.com yandex.com protonmail.com].freeze
-    SUSPICIOUS_TLDS = %w[.tk .ml .ga .cf .gq .xyz .top .work .click .link .bid .party .trade .webcam .racing .review].freeze
+    FREE_EMAIL_PROVIDERS = %w[gmail.com yahoo.com hotmail.com outlook.com aol.com mail.com yandex.com
+                              protonmail.com].freeze
+    SUSPICIOUS_TLDS = %w[.tk .ml .ga .cf .gq .xyz .top .work .click .link .bid .party .trade .webcam .racing
+                         .review].freeze
     COMMON_BRAND_DOMAINS = %w[
       microsoft.com apple.com amazon.com paypal.com bankofamerica.com chase.com wellsfargo.com
       google.com facebook.com twitter.com instagram.com linkedin.com netflix.com adobe.com
@@ -58,9 +60,9 @@ module PhishingDetection
       end
 
       # Check for IP-based domains (rare in legitimate emails)
-      if sender_domain =~ /^\d+\.\d+\.\d+\.\d+$/
-        add_indicator('critical', "Sender uses IP address instead of domain: #{sender_domain}", 'ip-address')
-      end
+      return unless sender_domain =~ /^\d+\.\d+\.\d+\.\d+$/
+
+      add_indicator('critical', "Sender uses IP address instead of domain: #{sender_domain}", 'ip-address')
     end
 
     def check_domain_spoofing
@@ -71,8 +73,9 @@ module PhishingDetection
         brand_name = brand.split('.').first
 
         # Check if sender name claims to be from a brand but domain doesn't match
-        if @email.sender_name.downcase.include?(brand_name) && !sender_domain.include?(brand_name)
-          add_indicator('critical', "Sender name claims '#{brand_name}' but domain is #{sender_domain}", 'brand-mismatch')
+        if @email.sender_name.downcase.include?(brand_name) && sender_domain.exclude?(brand_name)
+          add_indicator('critical', "Sender name claims '#{brand_name}' but domain is #{sender_domain}",
+                        'brand-mismatch')
           break
         end
 
@@ -94,9 +97,9 @@ module PhishingDetection
       numeric_count = domain_without_tld.scan(/\d/).length
 
       # If domain has excessive numbers, it might be suspicious
-      if numeric_count >= 3
-        add_indicator('medium', "Domain contains excessive numbers: #{sender_domain}", 'numeric-domain')
-      end
+      return unless numeric_count >= 3
+
+      add_indicator('medium', "Domain contains excessive numbers: #{sender_domain}", 'numeric-domain')
     end
   end
 end

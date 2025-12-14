@@ -4,21 +4,21 @@ require 'rails_helper'
 
 RSpec.describe ThreatScore, type: :model do
   describe 'associations' do
-    it { should belong_to(:email) }
+    it { is_expected.to belong_to(:email) }
   end
 
   describe 'validations' do
     subject { create(:threat_score) }
 
-    it { should validate_uniqueness_of(:email_id) }
-    it { should validate_presence_of(:score) }
-    it { should validate_presence_of(:calculated_at) }
-    it { should validate_numericality_of(:score).only_integer.is_greater_than_or_equal_to(0).is_less_than_or_equal_to(100) }
+    it { is_expected.to validate_uniqueness_of(:email_id) }
+    it { is_expected.to validate_presence_of(:score) }
+    it { is_expected.to validate_presence_of(:calculated_at) }
+    it { is_expected.to validate_numericality_of(:score).only_integer.is_greater_than_or_equal_to(0).is_less_than_or_equal_to(100) }
 
     it 'allows valid risk levels' do
       email = create(:email)
       ThreatScore::RISK_LEVELS.each do |level|
-        ThreatScore.where(email: email).destroy_all
+        described_class.where(email: email).destroy_all
         threat_score = build(:threat_score, email: email, score: 50, risk_level: level)
         expect(threat_score).to be_valid
       end
@@ -29,7 +29,7 @@ RSpec.describe ThreatScore, type: :model do
     describe '#set_calculated_at' do
       it 'sets calculated_at on create when nil' do
         email = create(:email)
-        threat_score = ThreatScore.new(email: email, score: 50)
+        threat_score = described_class.new(email: email, score: 50)
         expect(threat_score.calculated_at).to be_nil
         threat_score.save!
         expect(threat_score.calculated_at).to be_present
@@ -39,7 +39,7 @@ RSpec.describe ThreatScore, type: :model do
       it 'does not override calculated_at if already set' do
         email = create(:email)
         custom_time = 2.days.ago
-        threat_score = ThreatScore.create!(email: email, score: 50, calculated_at: custom_time)
+        threat_score = described_class.create!(email: email, score: 50, calculated_at: custom_time)
         expect(threat_score.calculated_at).to be_within(1.second).of(custom_time)
       end
     end
@@ -47,37 +47,37 @@ RSpec.describe ThreatScore, type: :model do
     describe '#set_risk_level_from_score' do
       it 'sets risk_level to low for scores 0-25' do
         email = create(:email)
-        threat_score = ThreatScore.create!(email: email, score: 20)
+        threat_score = described_class.create!(email: email, score: 20)
         expect(threat_score.risk_level).to eq('low')
       end
 
       it 'sets risk_level to medium for scores 26-50' do
         email = create(:email)
-        threat_score = ThreatScore.create!(email: email, score: 40)
+        threat_score = described_class.create!(email: email, score: 40)
         expect(threat_score.risk_level).to eq('medium')
       end
 
       it 'sets risk_level to high for scores 51-75' do
         email = create(:email)
-        threat_score = ThreatScore.create!(email: email, score: 65)
+        threat_score = described_class.create!(email: email, score: 65)
         expect(threat_score.risk_level).to eq('high')
       end
 
       it 'sets risk_level to critical for scores 76-100' do
         email = create(:email)
-        threat_score = ThreatScore.create!(email: email, score: 90)
+        threat_score = described_class.create!(email: email, score: 90)
         expect(threat_score.risk_level).to eq('critical')
       end
 
       it 'handles boundary values correctly' do
-        expect(ThreatScore.create!(email: create(:email), score: 0).risk_level).to eq('low')
-        expect(ThreatScore.create!(email: create(:email), score: 25).risk_level).to eq('low')
-        expect(ThreatScore.create!(email: create(:email), score: 26).risk_level).to eq('medium')
-        expect(ThreatScore.create!(email: create(:email), score: 50).risk_level).to eq('medium')
-        expect(ThreatScore.create!(email: create(:email), score: 51).risk_level).to eq('high')
-        expect(ThreatScore.create!(email: create(:email), score: 75).risk_level).to eq('high')
-        expect(ThreatScore.create!(email: create(:email), score: 76).risk_level).to eq('critical')
-        expect(ThreatScore.create!(email: create(:email), score: 100).risk_level).to eq('critical')
+        expect(described_class.create!(email: create(:email), score: 0).risk_level).to eq('low')
+        expect(described_class.create!(email: create(:email), score: 25).risk_level).to eq('low')
+        expect(described_class.create!(email: create(:email), score: 26).risk_level).to eq('medium')
+        expect(described_class.create!(email: create(:email), score: 50).risk_level).to eq('medium')
+        expect(described_class.create!(email: create(:email), score: 51).risk_level).to eq('high')
+        expect(described_class.create!(email: create(:email), score: 75).risk_level).to eq('high')
+        expect(described_class.create!(email: create(:email), score: 76).risk_level).to eq('critical')
+        expect(described_class.create!(email: create(:email), score: 100).risk_level).to eq('critical')
       end
     end
   end
@@ -90,14 +90,14 @@ RSpec.describe ThreatScore, type: :model do
 
     describe '.low_risk' do
       it 'returns only low risk scores' do
-        expect(ThreatScore.low_risk).to include(low_score)
-        expect(ThreatScore.low_risk).not_to include(medium_score, high_score, critical_score)
+        expect(described_class.low_risk).to include(low_score)
+        expect(described_class.low_risk).not_to include(medium_score, high_score, critical_score)
       end
     end
 
     describe '.medium_risk' do
       it 'returns only medium risk scores' do
-        medium_results = ThreatScore.medium_risk
+        medium_results = described_class.medium_risk
         expect(medium_results).to include(medium_score)
         expect(medium_results.pluck(:risk_level).uniq).to eq(['medium'])
       end
@@ -105,7 +105,7 @@ RSpec.describe ThreatScore, type: :model do
 
     describe '.high_risk' do
       it 'returns only high risk scores' do
-        high_results = ThreatScore.high_risk
+        high_results = described_class.high_risk
         expect(high_results).to include(high_score)
         expect(high_results.pluck(:risk_level).uniq).to eq(['high'])
       end
@@ -113,7 +113,7 @@ RSpec.describe ThreatScore, type: :model do
 
     describe '.critical_risk' do
       it 'returns only critical risk scores' do
-        critical_results = ThreatScore.critical_risk
+        critical_results = described_class.critical_risk
         expect(critical_results).to include(critical_score)
         expect(critical_results.pluck(:risk_level).uniq).to eq(['critical'])
       end
@@ -121,8 +121,8 @@ RSpec.describe ThreatScore, type: :model do
 
     describe '.by_risk' do
       it 'filters scores by risk level' do
-        expect(ThreatScore.by_risk('low')).to include(low_score)
-        expect(ThreatScore.by_risk('low')).not_to include(high_score)
+        expect(described_class.by_risk('low')).to include(low_score)
+        expect(described_class.by_risk('low')).not_to include(high_score)
       end
     end
   end

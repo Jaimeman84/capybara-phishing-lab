@@ -17,7 +17,13 @@ When('I click on the first email') do
 end
 
 When('I click the back or inbox link') do
-  click_link 'Back' rescue click_link 'Inbox' rescue click_link 'Email Inbox'
+  begin
+    click_link 'Back'
+  rescue StandardError
+    click_link 'Inbox'
+  end
+rescue StandardError
+  click_link 'Email Inbox'
 end
 
 When('I visit an email detail page') do

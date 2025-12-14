@@ -9,7 +9,8 @@ class ThreatScore < ApplicationRecord
 
   # Validations
   validates :email_id, uniqueness: true
-  validates :score, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
+  validates :score, presence: true,
+                    numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :risk_level, presence: true, inclusion: { in: RISK_LEVELS }
   validates :calculated_at, presence: true
 

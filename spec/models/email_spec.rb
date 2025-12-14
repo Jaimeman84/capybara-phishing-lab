@@ -4,19 +4,19 @@ require 'rails_helper'
 
 RSpec.describe Email, type: :model do
   describe 'associations' do
-    it { should have_one(:report).dependent(:destroy) }
-    it { should have_many(:phishing_indicators).dependent(:destroy) }
-    it { should have_one(:threat_score).dependent(:destroy) }
+    it { is_expected.to have_one(:report).dependent(:destroy) }
+    it { is_expected.to have_many(:phishing_indicators).dependent(:destroy) }
+    it { is_expected.to have_one(:threat_score).dependent(:destroy) }
   end
 
   describe 'validations' do
-    it { should validate_presence_of(:sender_email) }
-    it { should validate_presence_of(:sender_name) }
-    it { should validate_presence_of(:recipient_email) }
-    it { should validate_presence_of(:subject) }
-    it { should validate_presence_of(:body_plain) }
-    it { should validate_presence_of(:received_at) }
-    it { should validate_length_of(:subject).is_at_most(200) }
+    it { is_expected.to validate_presence_of(:sender_email) }
+    it { is_expected.to validate_presence_of(:sender_name) }
+    it { is_expected.to validate_presence_of(:recipient_email) }
+    it { is_expected.to validate_presence_of(:subject) }
+    it { is_expected.to validate_presence_of(:body_plain) }
+    it { is_expected.to validate_presence_of(:received_at) }
+    it { is_expected.to validate_length_of(:subject).is_at_most(200) }
 
     it 'validates sender_email format' do
       email = build(:email, sender_email: 'invalid-email')
@@ -58,7 +58,7 @@ RSpec.describe Email, type: :model do
 
     describe '.recent' do
       it 'orders emails by received_at descending' do
-        recent_emails = Email.recent.to_a
+        recent_emails = described_class.recent.to_a
         expect(recent_emails).to include(new_email, old_email)
         expect(recent_emails.index(new_email)).to be < recent_emails.index(old_email)
       end
@@ -66,28 +66,28 @@ RSpec.describe Email, type: :model do
 
     describe '.phishing' do
       it 'returns only phishing emails' do
-        expect(Email.phishing).to include(phishing_email)
-        expect(Email.phishing).not_to include(legitimate_email)
+        expect(described_class.phishing).to include(phishing_email)
+        expect(described_class.phishing).not_to include(legitimate_email)
       end
     end
 
     describe '.legitimate' do
       it 'returns only legitimate emails' do
-        expect(Email.legitimate).to include(legitimate_email)
-        expect(Email.legitimate).not_to include(phishing_email)
+        expect(described_class.legitimate).to include(legitimate_email)
+        expect(described_class.legitimate).not_to include(phishing_email)
       end
     end
 
     describe '.reported' do
       it 'returns only reported emails' do
-        expect(Email.reported).to include(reported_email)
-        expect(Email.reported).not_to include(phishing_email)
+        expect(described_class.reported).to include(reported_email)
+        expect(described_class.reported).not_to include(phishing_email)
       end
     end
 
     describe '.with_associations' do
       it 'eager loads associations' do
-        emails = Email.with_associations
+        emails = described_class.with_associations
         expect(emails).to be_a(ActiveRecord::Relation)
       end
     end

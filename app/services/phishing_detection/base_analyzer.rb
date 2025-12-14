@@ -11,9 +11,7 @@ module PhishingDetection
       raise NotImplementedError, "#{self.class} must implement #analyze"
     end
 
-    def indicators
-      @indicators
-    end
+    attr_reader :indicators
 
     private
 

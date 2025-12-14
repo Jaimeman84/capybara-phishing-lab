@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   root 'emails#index'
 
   # Email routes
-  resources :emails, only: [:index, :show]
+  resources :emails, only: %i[index show]
 
   # Reporting routes
   resources :reports, only: [:create]

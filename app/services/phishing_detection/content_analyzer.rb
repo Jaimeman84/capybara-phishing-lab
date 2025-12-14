@@ -2,8 +2,10 @@
 
 module PhishingDetection
   class ContentAnalyzer < BaseAnalyzer
-    URGENCY_KEYWORDS = ['urgent', 'immediate', 'act now', 'expire', 'suspended', 'verify', 'confirm', 'action required'].freeze
-    CREDENTIAL_KEYWORDS = ['password', 'login', 'username', 'account', 'verify account', 'update payment', 'billing information'].freeze
+    URGENCY_KEYWORDS = ['urgent', 'immediate', 'act now', 'expire', 'suspended', 'verify', 'confirm',
+                        'action required'].freeze
+    CREDENTIAL_KEYWORDS = ['password', 'login', 'username', 'account', 'verify account', 'update payment',
+                           'billing information'].freeze
 
     def analyze
       check_urgency_language

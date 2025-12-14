@@ -4,7 +4,8 @@ require:
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.4
+  SuggestExtensions: false
   Exclude:
     - 'bin/**/*'
     - 'db/schema.rb'
@@ -14,6 +15,11 @@ AllCops:
     - 'tmp/**/*'
     - 'log/**/*'
     - 'config/initializers/devise.rb'
+    - 'lib/tasks/cucumber.rake'
+
+# Disable line ending checks (cross-platform compatibility)
+Layout/EndOfLine:
+  Enabled: false
 
 # Prefer modern Ruby style
 Style/StringLiterals:
@@ -23,13 +29,6 @@ Style/StringLiterals:
 Style/FrozenStringLiteralComment:
   Enabled: true
   EnforcedStyle: always
-
-# Allow longer lines for readability
-Layout/LineLength:
-  Max: 120
-  Exclude:
-    - 'spec/**/*'
-    - 'features/**/*'
 
 # Allow longer methods in tests
 Metrics/MethodLength:
@@ -53,14 +52,48 @@ Style/Documentation:
 
 # RSpec-specific configurations
 RSpec/ExampleLength:
-  Max: 15
+  Max: 20
 
 RSpec/MultipleExpectations:
-  Max: 5
+  Max: 10
 
 RSpec/NestedGroups:
   Max: 4
 
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
 # Rails-specific configurations
 Rails/I18nLocaleTexts:
   Enabled: false
+
+Rails/Output:
+  Exclude:
+    - 'db/seeds.rb'
+
+# Disable some overly strict cops
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Layout/LineLength:
+  Exclude:
+    - 'db/seeds.rb'
+    - 'spec/**/*'
+    - 'features/**/*'
+
+# Script permissions not relevant on Windows
+Lint/ScriptPermission:
+  Enabled: false
+
+# Allow empty blocks in cucumber tasks
+Lint/EmptyBlock:
+  Exclude:
+    - 'lib/tasks/cucumber.rake'
+
+# Disable Style/NumericPredicate in Cucumber steps (causes issues with RSpec matchers)
+Style/NumericPredicate:
+  Exclude:
+    - 'features/**/*'
