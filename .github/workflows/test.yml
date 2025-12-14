@@ -50,7 +50,7 @@ jobs:
     - name: Run RSpec tests
       env:
         RAILS_ENV: test
-      run: bundle exec rspec
+      run: bundle exec rspec --options .rspec_ci
 
     - name: Run Cucumber tests
       env:
@@ -58,6 +58,15 @@ jobs:
         CI: true
         CAPYBARA_DRIVER: rack_test
       run: bundle exec cucumber
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: reports/
+        retention-days: 7
+        if-no-files-found: ignore
 
     - name: Upload coverage reports
       if: always()

@@ -26,7 +26,15 @@
       "Bash(bundle remove:*)",
       "Bash(tree:*)",
       "Bash(findstr:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash($env:CI=\"true\")",
+      "Bash($env:CAPYBARA_DRIVER=\"rack_test\")",
+      "Bash(if [ -f cucumber.yml ])",
+      "Bash(then cat cucumber.yml)",
+      "Bash(else echo \"File doesn''t exist\")",
+      "Bash(fi)",
+      "Bash(dir:*)",
+      "Bash(ls:*)"
     ]
   }
 }

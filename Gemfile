@@ -85,6 +85,9 @@ group :test do
   # Test coverage
   gem 'simplecov', '~> 0.22', require: false
 
+  # Test reporting
+  gem 'rspec_junit_formatter', require: false
+
   # RSpec matchers
   gem 'shoulda-matchers', '~> 5.0'
 end
