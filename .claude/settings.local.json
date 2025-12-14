@@ -34,7 +34,11 @@
       "Bash(else echo \"File doesn''t exist\")",
       "Bash(fi)",
       "Bash(dir:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(if [ -f tmp/cucumber-results.xml ])",
+      "Bash(then rm tmp/cucumber-results.xml)",
+      "Bash(if [ -f tmp/rspec-results.xml ])",
+      "Bash(then rm tmp/rspec-results.xml)"
     ]
   }
 }

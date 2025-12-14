@@ -1,1 +1,1 @@
-default: --publish-quiet --format pretty --format junit --out reports/cucumber
+default: --publish-quiet --format pretty --format junit --out reports/cucumber --format html --out reports/cucumber-results.html

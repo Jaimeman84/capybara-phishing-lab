@@ -268,6 +268,36 @@ Reports
 - **Professional Quality**: Production-ready code standards
 - **BDD Approach**: Business-readable Cucumber scenarios
 
+### Screenshots
+
+**Email Inbox**
+![Email Inbox](screenshots/phishing-lab-inbox.png)
+*Corporate email inbox with threat indicators and risk levels*
+
+**Unreported Email**
+![Unreported Email](screenshots/phishing-lab-email.png)
+*Email detail page before phishing analysis*
+
+**Admin Dashboard**
+![Admin Dashboard](screenshots/phishing-lab-dashboard.png)
+*Real-time analytics showing threat distribution and top indicators*
+
+**Phishing Analysis**
+![Phishing Analysis](screenshots/phishing-lab-reported-email.png)
+*Detailed threat analysis with detected indicators and severity levels*
+
+**Test Coverage**
+![Test Coverage](screenshots/phishing-lab-coverage-report.png)
+*93.12% line coverage with comprehensive test suite*
+
+**RSpec Report**
+![RSpec Report](screenshots/phishing-lab-rspec-report.png)
+*115 passing examples with detailed test output*
+
+**Cucumber Report**
+![Cucumber Report](screenshots/phishing-lab-cucumber-report.png)
+*23 scenarios, 117 steps - 100% passing*
+
 ---
 
 ## Testing Philosophy

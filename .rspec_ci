@@ -2,4 +2,6 @@
 --format documentation
 --format RspecJunitFormatter
 --out reports/rspec-results.xml
+--format html
+--out reports/rspec-results.html
 --color

@@ -1,13 +1,15 @@
 # Test Reporting
 
-This project includes automated test reporting in JUnit XML format for both RSpec and Cucumber tests.
+This project includes automated test reporting in both JUnit XML and HTML formats for RSpec and Cucumber tests.
 
 ## CI/CD Test Reporting
 
 Test reports are automatically generated during GitHub Actions CI runs:
 
-- **RSpec**: `reports/rspec-results.xml`
-- **Cucumber**: `reports/cucumber/` (directory with multiple XML files, one per feature)
+- **RSpec XML**: `reports/rspec-results.xml`
+- **RSpec HTML**: `reports/rspec-results.html`
+- **Cucumber XML**: `reports/cucumber/` (directory with multiple XML files, one per feature)
+- **Cucumber HTML**: `reports/cucumber-results.html`
 
 These reports are uploaded as artifacts and retained for 7 days.
 
@@ -16,17 +18,17 @@ These reports are uploaded as artifacts and retained for 7 days.
 Generate test reports locally:
 
 ```bash
-# Generate RSpec report (use CI config)
+# Generate RSpec reports (XML + HTML)
 bundle exec rspec --options .rspec_ci
 
-# Generate Cucumber report (uses default profile from cucumber.yml)
+# Generate Cucumber reports (XML + HTML)
 bundle exec cucumber
 ```
 
-For normal testing without generating XML reports:
+For normal testing without generating reports:
 
 ```bash
-# RSpec (no XML report)
+# RSpec (no reports)
 bundle exec rspec
 ```
 
@@ -34,7 +36,11 @@ All reports are created in the `reports/` directory (which is git-ignored).
 
 ## Viewing Reports
 
-JUnit XML reports can be viewed in:
+**HTML Reports** (easiest to view):
+- **RSpec**: Open `reports/rspec-results.html` in your browser
+- **Cucumber**: Open `reports/cucumber-results.html` in your browser
+
+**XML Reports** can be viewed in:
 - **CI Tools**: GitHub Actions, Jenkins, CircleCI, etc.
 - **IDEs**: IntelliJ IDEA, VS Code (with extensions)
 - **Reporting Tools**: Allure, ReportPortal, etc.

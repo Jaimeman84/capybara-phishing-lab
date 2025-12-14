@@ -47,6 +47,7 @@
 
 # Ignore test reports
 /reports/*
+/tmp/*.xml
 
 # Ignore RSpec examples status
 /spec/examples.txt
